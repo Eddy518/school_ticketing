@@ -1,0 +1,195 @@
+@import url(colors.css);
+
+html {
+    background: var(--primary-clr);
+}
+
+.profile-tooltip {
+    position: absolute;
+    background-color: var(--accent-clr);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    width: max-content;
+    max-width: 200px;
+    top: 60px;
+    right: 10px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.profile-tooltip:hover {
+    cursor: pointer;
+}
+
+.profile-tooltip::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    border-width: 0 8px 8px 8px;
+    border-style: solid;
+    border-color: transparent transparent var(--accent-clr) transparent;
+}
+
+.profile-tooltip.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* [Nav] */
+.nav {
+    position: fixed;
+    top: 0px;
+    z-index: 99999;
+    background: black;
+    width: 100%;
+}
+
+.nav header {
+    position: relative;
+}
+
+.right-nav {
+    display: flex;
+}
+
+.main-nav {
+    display: flex;
+}
+
+/**/
+.search-form {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#search {
+    color: white;
+    border-radius: 7px;
+    margin-right: 20px;
+    transition: all 0.3s ease;
+    background: var(--black);
+    border: 0.2px solid var(--accent-clr);
+    padding: 12px;
+}
+
+.search-toggle {
+    display: none;
+    /* Hidden by default on desktop */
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .search-form {
+        position: static;
+        /* This allows the dropdown to position relative to the nearest positioned ancestor */
+    }
+
+    #search {
+        position: absolute;
+        top: 100%;
+        /* Position right below the header */
+        left: 5%;
+        /* 5% margin from left */
+        width: 90%;
+        /* Take up 90% of the width */
+        padding: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        /* Ensure it appears above other content */
+    }
+
+    #search.active {
+        padding: 0.5rem 1rem;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .search-toggle {
+        display: block;
+        z-index: 1;
+    }
+}
+
+/* Add styles for the search results dropdown */
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 5%;
+    width: 90%;
+    background: #1a1a1a;
+    border-radius: 4px;
+    margin-top: 5px;
+    z-index: 1000;
+}
+
+.search-results ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.search-results li {
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.search-results li:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-btn {
+    font-size: 19px;
+    padding: 10px;
+    float: left;
+    width: 100%;
+}
+
+.nav-btn:hover {
+    opacity: 0.75;
+}
+
+.right-nav {
+    display: flex;
+}
+
+.right-nav .logout-btn:hover {
+    color: var(--logout-btn-hover);
+}
+
+/**/
+
+/* Header */
+header {
+    /* padding: 1rem 92px; */
+    padding: 1rem 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 0.3px dotted gray;
+}
+
+header .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 900;
+    color: var(--accent-clr);
+    cursor: pointer;
+}
+
+header a:hover {
+    color: var(--accent-clr-hover);
+}
