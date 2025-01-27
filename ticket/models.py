@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from itsdangerous import URLSafeTimedSerializer as Serializer
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 from ticket import app, db, login_manager
 
@@ -34,4 +34,4 @@ class User(db.Model, UserMixin):
         return self.id
 
     def __repr__(self):
-        return "<User %r>" % self.username
+        return "<User %r>" % self.email

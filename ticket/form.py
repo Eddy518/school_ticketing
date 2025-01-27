@@ -63,13 +63,8 @@ class PasswordResetForm(FlaskForm):
 
 
 class UpdateAccountForm(FlaskForm):
-    username = StringField(validators=[DataRequired(), Length(min=6, max=12)])
     email = EmailField("Email:", validators=[Email(), DataRequired()])
-    picture = FileField(
-        "Update Profile Picture",
-        validators=[FileAllowed(["jpg", "jpeg", "webp", "png"])],
-    )
-    account_submit = SubmitField("Update your Account Info")
+    account_submit = SubmitField("Update Account")
 
     def validate_email(self, email):
         if current_user.email != email.data:
@@ -83,7 +78,7 @@ class UpdatePasswordForm(FlaskForm):
     confirm_new_password = PasswordField(
         "Confirm New Password:", validators=[Length(min=6), EqualTo("new_password")]
     )
-    password_submit = SubmitField("Update your Password")
+    password_submit = SubmitField("Update Password")
 
 
 class DeleteAccountForm(FlaskForm):

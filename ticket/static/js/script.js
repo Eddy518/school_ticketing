@@ -5,9 +5,15 @@ const togglePassword = document.querySelector(".password-toggle-icon i");
 const confirmTogglePassword = document.querySelector(
   ".confirm-password-toggle-icon i",
 );
+const toastContainer = document.querySelector(".toast-container");
+const toastCloseButton = document.querySelector(".toast-btn");
 copyrightYear.textContent = (function () {
   return new Date().getFullYear();
 })();
+
+toastCloseButton.addEventListener("click", () => {
+  toastContainer.remove();
+});
 
 if (togglePassword) {
   togglePassword.addEventListener("click", function () {
