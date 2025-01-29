@@ -18,6 +18,7 @@ from flask import (
     request,
     session,
     url_for,
+    send_from_directory
 )
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_mail import Message
@@ -60,30 +61,39 @@ def create_ticket():
     # if request.method == "GET" and current_user.is_authenticated:
     #     form.email.data = current_user.email
     if form.validate_on_submit():
-        print("hey")
-        # Handling any uploaded files first
-        file = request.files['file_input']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        else:
+        ticket_id = str(uuid.uuid4().fields[-1])[:9]
+        print(app.config['UPLOAD_FOLDER'])
+        try:
+            print("hey")
+
             file_path = None
-        # email = current_user.email
-        # print(email)
-        new_ticket = Ticket(
-        ticket_id = str(uuid.uuid4().fields[-1])[:9],
-        department = 'IT DEPARTMENT',
-        service = 'support',
-        full_name = form.full_name.data,
-        email = form.email.data,
-        reg_no = form.reg_no.data,
-        subject = form.subject.data,
-        message = form.message.data,
-        file_input=file_path,
-        user_id = current_user.id,
-        )
-        db.session.add(new_ticket)
-        db.session.commit()
+            if 'file_input' in request.files:
+                file = request.files['file_input']
+                if file and file.filename != '' and allowed_file(file.filename):
+                    filename = f"{ticket_id}_{secure_filename(file.filename)}"
+                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    file.save(file_path)
+                    file_path = filename
+            new_ticket = Ticket(
+            ticket_id=ticket_id,
+            department = 'IT DEPARTMENT',
+            service = 'support',
+            full_name = form.full_name.data,
+            email = form.email.data,
+            reg_no = form.reg_no.data,
+            subject = form.subject.data,
+            message = form.message.data,
+            file_input=file_path,
+            user_id = current_user.id,
+            )
+            db.session.add(new_ticket)
+            db.session.commit()
+            flash('Ticket created successfully! Your ticket ID is: ' + ticket_id, 'success')
+            return redirect(url_for('view_ticket',ticket_id=ticket_id))
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred while creating the ticket. Please try again','error')
+            print(f"Error creating ticket: {str(e)}")
     else:
         for field, errors in form.errors.items():
             for error in errors:
@@ -106,6 +116,60 @@ def find_ticket():
             error = "No ticket found with that ID. Please check and try again."
             return render_template("track_ticket.html", error=error, current_page='track_a_ticket', form=form)
     return render_template("track_ticket.html", current_page='track_a_ticket',form=form)
+
+
+@app.route("/ticket/<ticket_id>")
+@login_required
+def view_ticket(ticket_id):
+    ticket = Ticket.query.filter_by(ticket_id=ticket_id).first_or_404()
+    return render_template("view_ticket.html", 
+                         ticket=ticket, 
+                         current_page='track_ticket')
+
+
+@app.route("/view-pdf/<ticket_id>")
+@login_required
+def view_pdf(ticket_id):
+    ticket = Ticket.query.filter_by(ticket_id=ticket_id).first_or_404()
+    
+    if not ticket.file_input or not ticket.file_input.lower().endswith('.pdf'):
+        flash('No PDF file attached to this ticket', 'error')
+        return redirect(url_for('view_ticket', ticket_id=ticket_id))
+    
+    try:
+        # Return the file with Content-Type as application/pdf
+        return send_from_directory(
+            app.config['UPLOAD_FOLDER'],
+            ticket.file_input,
+            mimetype='application/pdf'
+        )
+    except FileNotFoundError:
+        flash('File not found', 'error')
+        return redirect(url_for('view_ticket', ticket_id=ticket_id))
+
+
+@app.route("/download/<ticket_id>")
+@login_required
+def download_file(ticket_id):
+    ticket = Ticket.query.filter_by(ticket_id=ticket_id).first_or_404()
+    
+    if not ticket.file_input:
+        flash('No file attached to this ticket', 'error')
+        return redirect(url_for('view_ticket', ticket_id=ticket_id))
+    
+    # Get the filename from the file_input field
+    filename = ticket.file_input
+    
+    try:
+        # Return the file from the upload folder
+        return send_from_directory(
+            app.config['UPLOAD_FOLDER'],
+            filename,
+            as_attachment=True
+        )
+    except FileNotFoundError:
+        flash('File not found', 'error')
+        return redirect(url_for('view_ticket', ticket_id=ticket_id))
 
 
 @app.route("/tickets")

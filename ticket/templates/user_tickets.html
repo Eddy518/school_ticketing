@@ -56,7 +56,7 @@
                                         </td>
                                         <td class="px-6 py-4">
                                                 <a href="#"
-                                                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a> | <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline" href="">View More</a>
+                                                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a> | <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline" href="{{ url_for('view_ticket', ticket_id=user_ticket.ticket_id) }}">View More</a>
                                         </td>
                                 </tr>
                                 {% endfor %}
