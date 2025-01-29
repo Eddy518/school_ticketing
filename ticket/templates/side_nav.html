@@ -13,7 +13,7 @@
         class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
         aria-label="Sidebar">
         <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-                <a href="https://flowbite.com/" class="flex items-center ps-2.5 mb-5">
+                <a href="{{ url_for('home') }}" class="flex items-center ps-2.5 mb-5">
                         <img src="{{ url_for('static', filename='assets/logo.png') }}" class="h-6 me-3 sm:h-7"
                                 alt="Flowbite Logo" />
                         <span
@@ -44,19 +44,29 @@
                                                         ticket</a></span>
                                 </a>
                         </li>
-                        <li class="flex items-center">
+                        <li class="flex items-center
+                                {% if current_page == 'view_all_tickets' %}
+                                bg-gray-200
+                                {% endif %}
+                                ">
                                 <a href="#"
                                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                         <i class="fa-solid fa-list"></i>
-                                        <span class="flex-1 ms-3 whitespace-nowrap"><a href="">View all
+                                        <span class="flex-1 ms-3 whitespace-nowrap"><a
+                                                        href="{{ url_for('show_user_tickets') }}">View all
                                                         tickets</a></span>
                                 </a>
                         </li>
-                        <li class="flex items-center">
+                        <li class="flex items-center
+                                {% if current_page == 'track_a_ticket' %}
+                                bg-gray-100
+                                {% endif %}
+                                ">
                                 <a href="#"
                                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                         <i class="fa-solid fa-flag"></i>
-                                        <span class="flex-1 ms-3 whitespace-nowrap"><a href="">Track a ticket</a></span>
+                                        <span class="flex-1 ms-3 whitespace-nowrap"><a
+                                                        href="{{ url_for('find_ticket') }}">Track a ticket</a></span>
                                 </a>
                         </li>
                         <li class="flex items-center

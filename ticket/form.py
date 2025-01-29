@@ -1,5 +1,5 @@
 from flask_login import current_user
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import (
     BooleanField,
@@ -34,7 +34,26 @@ class LoginForm(FlaskForm):
     remember = BooleanField("Remember Me")
     submit = SubmitField("Login")
 
+class TrackTicketForm(FlaskForm):
+    ticket_id = StringField("TicketID",validators=[DataRequired()])
+    submit = SubmitField("Find Ticket")
 
+class TicketForm(FlaskForm):
+    full_name = StringField("Full Name", validators=[DataRequired(),
+                                                     Length(min=6, max=20)])
+    email = EmailField(validators=[Email()])
+    reg_no = StringField(validators=[DataRequired(), Length(min=9)])
+    subject = StringField("Subject Concern", validators=[DataRequired(),
+                                                         Length(max=20)])
+    message = TextAreaField("Message", validators=[DataRequired()])
+    file_input = FileField("File Attachments if any:")
+    recaptcha = RecaptchaField()
+    submit = SubmitField()
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError("Email already exists.")
 class SupportForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     email = EmailField("Email", validators=[Email(), DataRequired()])

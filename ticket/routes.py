@@ -2,8 +2,10 @@ import os
 import random
 import secrets
 import string
+import uuid
 from urllib.parse import urlencode
 from datetime import datetime, timezone
+from werkzeug.utils import secure_filename
 
 import requests
 from flask import (
@@ -20,7 +22,7 @@ from flask import (
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_mail import Message
 
-from ticket import app, bcrypt, db, mail
+from ticket import app, bcrypt, db, mail, allowed_file, get_service_name, get_department
 from ticket.form import (
     DeleteAccountForm,
     LoginForm,
@@ -29,9 +31,11 @@ from ticket.form import (
     RequestResetForm,
     UpdateAccountForm,
     UpdatePasswordForm,
+    TicketForm,
+    TrackTicketForm,
     SupportForm
 )
-from ticket.models import User
+from ticket.models import User, Ticket
 
 
 @app.route("/")
@@ -40,9 +44,76 @@ def home():
     return render_template("index.html", current_user=current_user, current_page='home')
 
 
-@app.route("/tickets/create")
+@app.route("/tickets/all")
 def available_tickets():
-    return render_template("create_ticket.html", current_user=current_user, current_page='create_a_ticket')
+    return render_template("available_tickets.html", current_user=current_user, current_page='create_a_ticket')
+
+
+@app.route("/ticket/create", methods=["GET", "POST"])
+@login_required
+def create_ticket():
+    form = TicketForm()
+    service = request.args.get('service')
+    print(service)
+    department = get_department(service)
+    print(department)
+    # if request.method == "GET" and current_user.is_authenticated:
+    #     form.email.data = current_user.email
+    if form.validate_on_submit():
+        print("hey")
+        # Handling any uploaded files first
+        file = request.files['file_input']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        else:
+            file_path = None
+        # email = current_user.email
+        # print(email)
+        new_ticket = Ticket(
+        ticket_id = str(uuid.uuid4().fields[-1])[:9],
+        department = 'IT DEPARTMENT',
+        service = 'support',
+        full_name = form.full_name.data,
+        email = form.email.data,
+        reg_no = form.reg_no.data,
+        subject = form.subject.data,
+        message = form.message.data,
+        file_input=file_path,
+        user_id = current_user.id,
+        )
+        db.session.add(new_ticket)
+        db.session.commit()
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                print(
+                    f"Error in {getattr(form, field).label.text}: {error}", "error"
+                )
+        # form.email.data = current_user.email
+    return render_template("create_ticket.html", form=form, department=department, service=service)
+
+
+@app.route("/ticket/track", methods=["GET","POST"])
+def find_ticket():
+    form = TrackTicketForm()
+    if request.method == "POST":
+        ticket_id = request.form.get('ticket_id')
+        ticket = Ticket.query.filter_by(ticket_id=ticket_id).first()
+        if ticket:
+            return render_template("track_ticket.html", ticket=ticket, current_page="track_a_ticket", form=form)
+        else:
+            error = "No ticket found with that ID. Please check and try again."
+            return render_template("track_ticket.html", error=error, current_page='track_a_ticket', form=form)
+    return render_template("track_ticket.html", current_page='track_a_ticket',form=form)
+
+
+@app.route("/tickets")
+def show_user_tickets():
+    user_tickets = Ticket.query.filter_by(user_id=current_user.id).order_by(Ticket.created_at.desc()).all()
+    # user_tickets = Ticket.query.all()
+    print(user_tickets)
+    return render_template("user_tickets.html", current_page='view_all_tickets',user_tickets=user_tickets)
 
 # @app.route("/support", methods=["GET", "POST"])
 # def support():
@@ -204,6 +275,8 @@ def profile():
             db.session.commit()
             flash("Your Account Info has been updated successfully!", "info")
             return redirect(url_for("profile"))
+    else:
+        account_form.email.data = current_user.email
     if password_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(password_form.new_password.data)
         current_user.password = hashed_password
