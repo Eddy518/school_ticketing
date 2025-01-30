@@ -16,17 +16,23 @@
                                 <div class="font-bold text-gray-700">Registration No:</div>
                                 <div>{{ ticket.reg_no }}</div>
 
+                                <div class="font-bold text-gray-700">Email:</div>
+                                <div>{{ ticket.email }}</div>
+
                                 <div class="font-bold text-gray-700">Department:</div>
-                                <div>{{ ticket.department }}</div>
+                                <div class="uppercase">{{ ticket.department }}</div>
 
                                 <div class="font-bold text-gray-700">Service:</div>
                                 <div>{{ ticket.service }}</div>
+
+                                <div class="font-bold text-gray-700">Ticket Status:</div>
+                                <div class="text-red-500">{{ ticket.ticket_status }}</div>
 
                                 <div class="font-bold text-gray-700">Subject:</div>
                                 <div>{{ ticket.subject }}</div>
 
                                 <div class="font-bold text-gray-700">Created At:</div>
-                                <div>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+                                <div>{{ local_created_at.strftime('%Y-%m-%d %H:%M') }}</div>
 
 
                         </div>

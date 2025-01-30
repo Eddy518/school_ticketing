@@ -3,6 +3,7 @@ import random
 import secrets
 import string
 import uuid
+import pytz
 from urllib.parse import urlencode
 from datetime import datetime, timezone
 from werkzeug.utils import secure_filename
@@ -23,7 +24,7 @@ from flask import (
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_mail import Message
 
-from ticket import app, bcrypt, db, mail, allowed_file, get_service_name, get_department
+from ticket import app, bcrypt, db, mail, allowed_file, get_department_and_service
 from ticket.form import (
     DeleteAccountForm,
     LoginForm,
@@ -33,6 +34,7 @@ from ticket.form import (
     UpdateAccountForm,
     UpdatePasswordForm,
     TicketForm,
+    EditTicketForm,
     TrackTicketForm,
     SupportForm
 )
@@ -54,18 +56,24 @@ def available_tickets():
 @login_required
 def create_ticket():
     form = TicketForm()
-    service = request.args.get('service')
-    print(service)
-    department = get_department(service)
-    print(department)
-    # if request.method == "GET" and current_user.is_authenticated:
-    #     form.email.data = current_user.email
+
+    if request.method == "POST":
+        service_key = request.form.get("service")
+        department_key = request.form.get("department")
+    else:
+        service_key = request.args.get('service')
+        department_key = request.args.get('department')
+    print("Department, Service Key in routes",department_key,service_key)
+
+    department, service = get_department_and_service(
+        service_key=service_key,
+        department_key=department_key
+    )
+
+    form.email.data = current_user.email
     if form.validate_on_submit():
         ticket_id = str(uuid.uuid4().fields[-1])[:9]
-        print(app.config['UPLOAD_FOLDER'])
         try:
-            print("hey")
-
             file_path = None
             if 'file_input' in request.files:
                 file = request.files['file_input']
@@ -76,8 +84,8 @@ def create_ticket():
                     file_path = filename
             new_ticket = Ticket(
             ticket_id=ticket_id,
-            department = 'IT DEPARTMENT',
-            service = 'support',
+            department = department,
+            service = service,
             full_name = form.full_name.data,
             email = form.email.data,
             reg_no = form.reg_no.data,
@@ -103,6 +111,28 @@ def create_ticket():
         # form.email.data = current_user.email
     return render_template("create_ticket.html", form=form, department=department, service=service)
 
+@app.route('/ticket/<ticket_id>/edit',methods=["GET","POST"])
+def edit_ticket(ticket_id):
+    form = EditTicketForm()
+    print(form.file_input.data)
+    ticket = Ticket.query.filter_by(ticket_id=ticket_id).first()
+    form.full_name.data = ticket.full_name
+    form.email.data = ticket.email
+    form.reg_no.data = ticket.reg_no
+    form.subject.data = ticket.subject
+    form.message.data = ticket.message
+    form.file_input.data = ticket.file_input
+    if form.validate_on_submit():
+        if (
+    form.full_name.data == ticket.full_name and
+    form.email.data == ticket.email and
+    form.reg_no.data == ticket.reg_no and
+    form.subject.data == ticket.subject and
+    form.message.data == ticket.message and
+    form.file_input.data == None):
+            return redirect('edit_ticket')
+
+    return render_template("edit_ticket.html",form=form, ticket=ticket)
 
 @app.route("/ticket/track", methods=["GET","POST"])
 def find_ticket():
@@ -118,13 +148,21 @@ def find_ticket():
     return render_template("track_ticket.html", current_page='track_a_ticket',form=form)
 
 
+
+def convert_to_local(utc_dt):
+    """Convert UTC time to user's local timezone"""
+    user_tz = request.cookies.get('user_timezone', 'UTC')
+    local_timezone = pytz.timezone(user_tz)
+    return utc_dt.replace(tzinfo=pytz.utc).astimezone(local_timezone)
+
 @app.route("/ticket/<ticket_id>")
 @login_required
 def view_ticket(ticket_id):
     ticket = Ticket.query.filter_by(ticket_id=ticket_id).first_or_404()
+    local_created_at = convert_to_local(ticket.created_at)
     return render_template("view_ticket.html", 
                          ticket=ticket, 
-                         current_page='track_ticket')
+                         current_page='track_ticket', local_created_at=local_created_at)
 
 
 @app.route("/view-pdf/<ticket_id>")
@@ -253,7 +291,7 @@ def register():
             db.session.commit()
             flash(
                 f" {form.email.data} you have been successfully registered. Log in to proceed.",
-                "info",
+                "success",
             )
             return redirect(url_for("login"))
         else:
@@ -370,6 +408,12 @@ def logout():
     return redirect(url_for("home"))
 
 
+from werkzeug.exceptions import RequestEntityTooLarge
+
+@app.errorhandler(RequestEntityTooLarge)
+def handle_large_file_error(e):
+    flash("File is too large! Maximum allowed size is 2MB.", "error")
+    return redirect(request.url)  # Redirect back to the form
 # @app.errorhandler(404)
 # def error_404(error):
 #     return render_template("404.html")

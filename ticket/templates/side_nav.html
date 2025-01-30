@@ -25,7 +25,7 @@
                                 bg-gray-100
                                 {% endif %}
                                 ">
-                                <a href="#"
+                                <a href="{{ url_for('home') }}"
                                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                         <i class="fa-solid fa-house"></i>
                                         <span class="ms-3"><a href="{{ url_for('home') }}">Home</a></span>
@@ -36,7 +36,7 @@
                                 bg-gray-100
                                 {% endif %}
                                 ">
-                                <a href="#"
+                                <a href="{{ url_for('available_tickets') }}"
                                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                         <i class="fa-solid fa-pen"></i>
                                         <span class="flex-1 ms-3 whitespace-nowrap"><a
@@ -49,7 +49,7 @@
                                 bg-gray-200
                                 {% endif %}
                                 ">
-                                <a href="#"
+                                <a href="{{ url_for('show_user_tickets') }}"
                                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                         <i class="fa-solid fa-list"></i>
                                         <span class="flex-1 ms-3 whitespace-nowrap"><a
@@ -62,7 +62,7 @@
                                 bg-gray-100
                                 {% endif %}
                                 ">
-                                <a href="#"
+                                <a href="{{ url_for('find_ticket') }}"
                                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                         <i class="fa-solid fa-flag"></i>
                                         <span class="flex-1 ms-3 whitespace-nowrap"><a
@@ -74,7 +74,7 @@
                                 bg-gray-200
                                 {% endif %}
                                 ">
-                                <a href="#"
+                                <a href="{{ url_for('profile') }}"
                                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                         <i class="fa-solid fa-gear"></i>
                                         <span class="flex-1 ms-3 whitespace-nowrap"><a
@@ -82,7 +82,7 @@
                                 </a>
                         </li>
                         <li class="flex items-center">
-                                <a href="#"
+                                <a href="{{ url_for('logout') }}"
                                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                         <i class="fa-solid fa-right-from-bracket"></i>
                                         <span class="flex-1 ms-3 whitespace-nowrap"><a

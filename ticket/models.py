@@ -51,8 +51,9 @@ class Ticket(db.Model):
     subject = db.Column(db.String(100), nullable=False)
     message = db.Column(db.Text, nullable=False)
     file_input = db.Column(db.Text)
+    ticket_status = db.Column(db.String(50), default="pending")
     created_at = db.Column(
-        db.DateTime, nullable=False, default=datetime.now(timezone.utc)
+        db.DateTime, nullable=False, default=datetime.utcnow
     )
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 

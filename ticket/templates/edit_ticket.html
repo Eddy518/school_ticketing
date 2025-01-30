@@ -11,11 +11,12 @@
 <div class="p-4 sm:ml-64">
         <div class="p-8 mb-10">
                 <h1 class="text-3xl font-bold text-[#6b7280] text-center ">Submit a Ticket</h1>
-                <p class="text-[#6b7280] text-center mb-8">All required fields are marked with<span class="text-red-500 ml-0.5">*</span></p>
-                <form class="max-w-sm mx-auto" autocomplete="off" method="post" enctype="multipart/form-data" action="{{ url_for('create_ticket') }}">
+                <p class="text-[#6b7280] text-center">All required fields are marked with<span class="text-red-500 ml-0.5">*</span></p>
+                <p class="text-[#6b7280] text-center mb-8">Note: Modifying this ticket will create a brand new ticket.</p>
+                <form class="max-w-sm mx-auto" autocomplete="off" method="post" enctype="multipart/form-data" action="{{ url_for('edit_ticket',ticket_id=ticket.ticket_id) }}">
                         {{ form.csrf_token }}
-                        <input type="hidden" name="department" value="{{ request.args.get('department') or department }}">
-                        <input type="hidden" name="service" value="{{ request.args.get('service') or service }}">
+                        <input type="hidden" name="department" value="{{ department }}">
+                        <input type="hidden" name="service" value="{{ service }}">
                         <div class="mb-5">
                                 <div class="flex items-start" >
                                 <label for="fullname"
@@ -37,7 +38,7 @@
                                 <label for="email"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email:</label><span class="text-red-500 ml-0.5">*</span></div>
                                 {{ form.email(id="email",
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500",disabled=True
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         ) }}
                                 {% if form.email.errors %}
                                 <div class="">
@@ -95,7 +96,7 @@
                         <div class="mb-5">
                                 <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">File attachments if any:</label>
                                 {{ form.file_input(class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400", id="file_input") }}
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Only PDF files are accepted (MAX: 2MB). Any other file extensions will be ignored.</p>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Only PDF files are accepted</p>
                                 {% if form.file_input.errors %}
                                 <div class="">
                                     {% for error in form.file_input.errors %}
@@ -118,15 +119,4 @@
                 </form>
         </div>
 </div>
-<script>
-document.getElementById("file_input").addEventListener("change", function() {
-    const file = this.files[0];
-    const maxSize = 2 * 1024 * 1024; // 2MB
-
-    if (file && file.size > maxSize) {
-        alert("File is too large! Maximum allowed size is 2MB.");
-        this.value = ""; // Reset file input
-    }
-});
-</script>
 {% endblock body %}

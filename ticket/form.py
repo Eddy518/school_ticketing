@@ -50,10 +50,25 @@ class TicketForm(FlaskForm):
     recaptcha = RecaptchaField()
     submit = SubmitField()
 
+
+class EditTicketForm(FlaskForm):
+    full_name = StringField("Full Name", validators=[DataRequired(),
+                                                     Length(min=6, max=20)])
+    email = EmailField(validators=[Email()])
+    reg_no = StringField(validators=[DataRequired(), Length(min=9)])
+    subject = StringField("Subject Concern", validators=[DataRequired(),
+                                                         Length(max=20)])
+    message = TextAreaField("Message", validators=[DataRequired()])
+    file_input = FileField("File Attachments if any:")
+    recaptcha = RecaptchaField()
+    submit = SubmitField()
+
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError("Email already exists.")
+
+
 class SupportForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     email = EmailField("Email", validators=[Email(), DataRequired()])

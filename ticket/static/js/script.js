@@ -15,6 +15,10 @@ toastCloseButton.addEventListener("click", () => {
   toastContainer.remove();
 });
 
+setTimeout(() => {
+  toastContainer.remove();
+}, 5000);
+
 if (togglePassword) {
   togglePassword.addEventListener("click", function () {
     if (passwordField.type === "password") {
@@ -41,3 +45,9 @@ if (confirmTogglePassword) {
     }
   });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  //capture a user's timezone to a cookie
+  let userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  document.cookie = "user_timezone=" + userTimezone + "; path=/";
+});

@@ -24,7 +24,7 @@
                                 <p class="text-gray-600 mb-6">Please select any one of the ICT Services we can assist
                                         you with from the dropdown below</p>
                                 <select
-                                        class="w-full max-w-xs bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors cursor-pointer" onchange="if (this.value) window.location.href='/ticket/create?service=' + this.value">
+                                        class="w-full max-w-xs bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors cursor-pointer" onchange="if (this.value) window.location.href='/ticket/create?department=it_services&service=' + this.value">
                                         <option value="" disabled selected>Select a Service ▼</option>
                                         <option value="support">Technical Support</option>
                                         <option value="network">Eduroam and Network Services</option>
@@ -49,7 +49,7 @@
                                         SCHOOL SERVICES</h2>
                                 <p class="text-gray-600 mb-6">Kusoma Account, Digital School services</p>
                                 <select
-                                        class="w-full max-w-xs bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors cursor-pointer" onchange="if (this.value) window.location.href='/ticket/create?service=' + this.value">
+                                        class="w-full max-w-xs bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors cursor-pointer" onchange="if (this.value) window.location.href='/ticket/create?department=it_services&service=' + this.value">
                                         <option value="" disabled selected>Select a Service ▼</option>
                                         <option value="account">Kusoma Account Setup</option>
                                         <option value="password">Password Reset</option>
@@ -63,10 +63,9 @@
         </div>
 
         <h1 class="text-3xl font-bold text-[#6b7280] text-center mb-8">Admissions Department Services</h1>
-
         <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
                 <div
-                        class="bg-yellow-50 rounded-lg p-8 flex flex-col items-center text-center shadow-[0_2px_4px_0px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_8px_0px_rgba(0,0,0,0.25)] transition-shadow duration-300 hover:cursor-pointer">
+                        class="bg-yellow-50 rounded-lg p-8 flex flex-col items-center text-center shadow-[0_2px_4px_0px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_8px_0px_rgba(0,0,0,0.25)] transition-shadow duration-300 hover:cursor-pointer" onclick="window.location.href='/ticket/create?department=admissions&service=undergraduate'">
                         <div
                                 class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 border-2 border-blue-500">
                                 <svg class="w-8 h-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -84,7 +83,7 @@
                 </div>
 
                 <div
-                        class="bg-yellow-50 rounded-lg p-8 flex flex-col items-center text-center shadow-[0_2px_4px_0px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_8px_0px_rgba(0,0,0,0.25)] hover:cursor-pointer">
+                        class="bg-yellow-50 rounded-lg p-8 flex flex-col items-center text-center shadow-[0_2px_4px_0px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_8px_0px_rgba(0,0,0,0.25)] hover:cursor-pointer" onclick="window.location.href='/ticket/create?department=admissions&service=postgraduate'">
                         <div
                                 class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 border-2 border-blue-500">
                                 <svg class="w-8 h-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -106,9 +105,8 @@
 
         <h1 class="text-3xl font-bold text-[#6b7280] text-center mb-8 mt-8">Finance Department Services</h1>
         <div class="max-w-6xl mx-auto grid md:grid-cols-1 gap-8">
-                <a href="{{ url_for('create_ticket') }}">
                 <div
-                        class="bg-yellow-50 rounded-lg p-8 flex flex-col items-center text-center shadow-[0_2px_4px_0px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_8px_0px_rgba(0,0,0,0.25)] hover:cursor-pointer">
+                        class="bg-yellow-50 rounded-lg p-8 flex flex-col items-center text-center shadow-[0_2px_4px_0px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_8px_0px_rgba(0,0,0,0.25)] hover:cursor-pointer" onclick="window.location.href='/ticket/create?department=finance&service=student_finance_banking'">
                         <div
                                 class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 border-2 border-blue-500">
                                 <svg class="w-8 h-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -124,7 +122,6 @@
                         <p class="text-gray-600 mb-6">Finance related issues such as invoicing, refunds, fee statements
                                 etc.</p>
                 </div>
-        </a>
         </div>
 </div>
 {% endblock body %}

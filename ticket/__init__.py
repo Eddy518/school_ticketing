@@ -36,7 +36,7 @@ def allowed_file(filename):
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
@@ -45,37 +45,54 @@ csrf = CSRFProtect(app)
 
 
 SERVICE_DEPARTMENTS = {
-    # IT Services
-    'IT_SERVICES': {
-        'technical-support': 'Technical Support',
-        'network-issues': 'Network Issues',
-        'software-installation': 'Software Installation',
-        'hardware-repairs': 'Hardware Repairs',
-        'email-config': 'Email Configuration',
-        'security-services': 'Security Services'
+    'it': {
+        'support': 'Technical Support',
+        'network': 'Eduroam and Network Services',
+        'portal': 'Student Portal',
+        'lms': 'Learning Management System(LMS)',
+        'email': 'Email Configuration',
+        'security': 'Security Services'
     },
-    
-    # E-Learning
-    'E_LEARNING': {
-        'kusoma-setup': 'Kusoma Account Setup',
-        'password-reset': 'Password Reset',
-        'course-access': 'Course Access',
-        'digital-library': 'Digital Library',
-        'learning-resources': 'Learning Resources',
-        'elearning-support': 'E-Learning Support'
+    'it': {
+        'account': 'Kusoma Account Setup',
+        'password': 'Password Reset',
+        'courses': 'Course Access',
+        'digital': 'Digital Library',
+        'resources': 'Learning Resources',
+        'support': 'E-Learning Support'
+    },
+    'admissions': {
+        'undergraduate': 'Undergraduate Admissions',
+        'postgraduate': 'Postgraduate Admissions'
+    },
+    'finance': {
+        'student_finance_banking': 'Student Finance and Banking'
     }
 }
 
-def get_department(service):
-    for department, services in SERVICE_DEPARTMENTS.items():
-        if service in services:
-            return department.replace('_', ' ')
-    return 'Unknown'
-
-def get_service_name(service_key):
-    for department in SERVICE_DEPARTMENTS.values():
-        if service_key in department:
-            return department[service_key]
-    return service_key
+def get_department_and_service(service_key=None, department_key=None):
+    print("In init.py",department_key,service_key)
+    if service_key:
+        print("Service key being checked", service_key)
+        for dept, services in SERVICE_DEPARTMENTS.items():
+            if service_key in services.keys():
+                print("Matched department")
+                return (
+                    dept.replace('_', ' '),
+                    services[service_key]
+                )
+    
+    elif department_key:
+        dept = department_key.lower().replace(' ', '_')
+        if dept in SERVICE_DEPARTMENTS:
+            services = SERVICE_DEPARTMENTS[dept]
+            service_key = list(services.keys())[0]
+            print("Using default service", service_key)
+            return (
+                dept.replace('_', ' '),
+                services[service_key]
+            )
+    print("Returning unkown department")
+    return ('Unknown Department', 'Unknown Service')
 
 from ticket import routes
