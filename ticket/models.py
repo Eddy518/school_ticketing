@@ -42,7 +42,7 @@ class User(db.Model, UserMixin):
 
 class Ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    ticket_id = db.Column(db.String(9), nullable=False)
+    ticket_id = db.Column(db.String(9), unique=True, nullable=False)
     department = db.Column(db.String(50), nullable=False)
     service = db.Column(db.String(50), nullable=False)
     full_name = db.Column(db.String(100), nullable=False)

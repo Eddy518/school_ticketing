@@ -51,15 +51,12 @@ SERVICE_DEPARTMENTS = {
         'portal': 'Student Portal',
         'lms': 'Learning Management System(LMS)',
         'email': 'Email Configuration',
-        'security': 'Security Services'
-    },
-    'it': {
+        'security': 'Security Services',
         'account': 'Kusoma Account Setup',
         'password': 'Password Reset',
         'courses': 'Course Access',
         'digital': 'Digital Library',
         'resources': 'Learning Resources',
-        'support': 'E-Learning Support'
     },
     'admissions': {
         'undergraduate': 'Undergraduate Admissions',

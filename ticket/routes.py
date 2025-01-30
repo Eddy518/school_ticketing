@@ -114,23 +114,109 @@ def create_ticket():
 @app.route('/ticket/<ticket_id>/edit',methods=["GET","POST"])
 def edit_ticket(ticket_id):
     form = EditTicketForm()
-    print(form.file_input.data)
     ticket = Ticket.query.filter_by(ticket_id=ticket_id).first()
-    form.full_name.data = ticket.full_name
+    if not ticket:
+        flash("Ticket not found!","error")
+        return redirect(url_for('available_tickets'))
+
     form.email.data = ticket.email
-    form.reg_no.data = ticket.reg_no
-    form.subject.data = ticket.subject
-    form.message.data = ticket.message
-    form.file_input.data = ticket.file_input
+    if request.method == "GET":
+        form.full_name.data = ticket.full_name
+        form.email.data = ticket.email
+        form.reg_no.data = ticket.reg_no
+        form.subject.data = ticket.subject
+        form.message.data = ticket.message
+        form.file_input.data = ticket.file_input
     if form.validate_on_submit():
+        full_name = form.full_name.data
+        email = form.email.data
+        reg_no = form.reg_no.data
+        subject = form.subject.data
+        message = form.message.data
+
+        file = request.files.get('file_input')
+        file_uploaded = file and file.filename != '' and allowed_file(file.filename)
         if (
-    form.full_name.data == ticket.full_name and
-    form.email.data == ticket.email and
-    form.reg_no.data == ticket.reg_no and
-    form.subject.data == ticket.subject and
-    form.message.data == ticket.message and
-    form.file_input.data == None):
-            return redirect('edit_ticket')
+            full_name == ticket.full_name and
+            email == ticket.email and
+            reg_no == ticket.reg_no and
+            subject == ticket.subject and
+            message == ticket.message and
+                not file_uploaded
+            ):
+            flash("Nothing has changed","info")
+            return redirect(url_for('edit_ticket',ticket_id=ticket.ticket_id))
+        
+        print("I am being called")
+        new_ticket_id = str(uuid.uuid4().fields[-1])[:9]
+
+        file_path = None
+        if file_uploaded:
+            filename = f"{new_ticket_id}_{secure_filename(file.filename)}"
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            file_path = filename
+        try:
+            new_ticket = Ticket(
+                ticket_id=new_ticket_id,
+                department=ticket.department,
+                service=ticket.service,
+                full_name=full_name,
+                email=email,
+                reg_no=reg_no,
+                subject=subject,
+                message=message,
+                file_input=file_path,
+                user_id=current_user.id)
+            db.session.add(new_ticket)
+            db.session.commit()
+            flash(f'New Ticket has been submitted successfully! Your new ticket ID is: {new_ticket_id}', 'success')
+            return redirect(url_for('view_ticket', ticket_id=new_ticket_id))
+
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred while creating the ticket. Please try again', 'error')
+            print(f"Error creating ticket: {str(e)}")
+    #     else:
+    #         print("I am being called")
+    #         ticket_id = str(uuid.uuid4().fields[-1])[:9]
+    #         try:
+    #             file_path = None
+    #             if 'file_input' in request.files:
+    #                 file = request.files['file_input']
+    #                 if file and file.filename != '' and allowed_file(file.filename):
+    #                     filename = f"{ticket_id}_{secure_filename(file.filename)}"
+    #                     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    #                     file.save(file_path)
+    #                     file_path = filename
+    #             new_ticket = Ticket(
+    #             ticket_id=ticket_id,
+    #             department = ticket.department,
+    #             service = ticket.service,
+    #             full_name = form.full_name.data,
+    #             email = form.email.data,
+    #             reg_no = form.reg_no.data,
+    #             subject = form.subject.data,
+    #             message = form.message.data,
+    #             file_input=file_path,
+    #             user_id = current_user.id,
+    #             )
+    #             db.session.add(new_ticket)
+    #             db.session.commit()
+    #             flash('New Ticket has been submitted successfully! Your ticket ID is: ' + ticket_id, 'success')
+    #             redirect(url_for('view_ticket'))
+    #
+    #         except Exception as e:
+    #             db.session.rollback()
+    #             flash('An error occurred while creating the ticket. Please try again','error')
+    #             print(f"Error creating ticket: {str(e)}")
+    # else:
+    #     for field, errors in form.errors.items():
+    #         for error in errors:
+    #             print(
+    #                 f"Error in {getattr(form, field).label.text}: {error}", "error"
+    #             )
+
 
     return render_template("edit_ticket.html",form=form, ticket=ticket)
 

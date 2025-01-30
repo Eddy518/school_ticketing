@@ -63,11 +63,6 @@ class EditTicketForm(FlaskForm):
     recaptcha = RecaptchaField()
     submit = SubmitField()
 
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user:
-            raise ValidationError("Email already exists.")
-
 
 class SupportForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
