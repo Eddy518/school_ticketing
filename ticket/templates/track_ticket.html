@@ -34,8 +34,13 @@
                 <th scope="col" class="px-6 py-3">Department</th>
                 <th scope="col" class="px-6 py-3">Service</th>
                 <th scope="col" class="px-6 py-3">Subject</th>
+                    {% if current_user.id == ticket.user_id %}
                 <th scope="col" class="px-6 py-3">Message</th>
+                    {% endif %}
+                <th scope="col" class="px-6 py-3">Status</th>
+                    {% if current_user.id == ticket.user_id %}
                 <th scope="col" class="px-6 py-3">Actions</th>
+                    {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -46,11 +51,16 @@
                 <td class="px-6 py-4">{{ ticket.department }}</td>
                 <td class="px-6 py-4">{{ ticket.service }}</td>
                 <td class="px-6 py-4">{{ ticket.subject }}</td>
+                    {% if current_user.id == ticket.user_id %}
                 <td class="px-6 py-4 max-w-xs truncate">{{ ticket.message }}</td>
+                    {% endif %}
+                <td class="px-6 py-4 max-w-xs truncate">{{ ticket.ticket_status }}</td>
+                    {% if current_user.id == ticket.user_id %}
                 <td class="px-6 py-4">
                     <a href="" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a> |
                     <a href="{{ url_for('view_ticket', ticket_id=ticket.ticket_id) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">View More</a>
                 </td>
+                    {% endif %}
             </tr>
         </tbody>
     </table>

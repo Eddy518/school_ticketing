@@ -4,6 +4,8 @@ import secrets
 import string
 import uuid
 import pytz
+import matplotlib.pyplot as plt
+import io
 from urllib.parse import urlencode
 from datetime import datetime, timezone
 from werkzeug.utils import secure_filename
@@ -19,7 +21,8 @@ from flask import (
     request,
     session,
     url_for,
-    send_from_directory
+    send_from_directory,
+    Response
 )
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_mail import Message
@@ -44,12 +47,44 @@ from ticket.models import User, Ticket
 @app.route("/")
 def home():
     print(current_user.is_authenticated)
-    return render_template("index.html", current_user=current_user, current_page='home')
+    tickets = Ticket.query.order_by(Ticket.created_at).all()
+    return render_template("index.html", current_user=current_user, current_page='home', tickets=tickets)
 
 
 @app.route("/tickets/all")
 def available_tickets():
     return render_template("available_tickets.html", current_user=current_user, current_page='create_a_ticket')
+
+
+@app.route('/ticket-graph')
+def ticket_graph():
+    # Query database for ticket counts per department
+    ticket_counts = db.session.query(Ticket.department, db.func.count(Ticket.id)).group_by(Ticket.department).all()
+
+    # Extract data
+    departments = [row[0] for row in ticket_counts]
+    counts = [row[1] for row in ticket_counts]
+
+    # Create the bar chart
+    plt.figure(figsize=(8, 5))
+    plt.bar(departments, counts, color=['blue', 'green', 'red', 'orange'])
+    plt.xlabel("Departments")
+    plt.ylabel("Number of Tickets")
+    plt.title("Tickets Created Per Department")
+    plt.xticks(rotation=30)  # Rotate x-axis labels for readability
+
+    # Convert plot to an image in memory
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    plt.close()
+
+    return Response(img.getvalue(), mimetype='image/png')
+
+
+@app.route("/tickets/visualize/graph")
+def graph_tickets():
+    return render_template("ticket_analytics.html", current_user=current_user, current_page='ticket_analytics')
 
 
 @app.route("/ticket/create", methods=["GET", "POST"])
@@ -115,6 +150,10 @@ def create_ticket():
 def edit_ticket(ticket_id):
     form = EditTicketForm()
     ticket = Ticket.query.filter_by(ticket_id=ticket_id).first()
+
+    # Prevent a user from editing another user tickets
+    if current_user.id != ticket.user_id:
+        abort(403)
     if not ticket:
         flash("Ticket not found!","error")
         return redirect(url_for('available_tickets'))
@@ -231,7 +270,7 @@ def find_ticket():
         else:
             error = "No ticket found with that ID. Please check and try again."
             return render_template("track_ticket.html", error=error, current_page='track_a_ticket', form=form)
-    return render_template("track_ticket.html", current_page='track_a_ticket',form=form)
+    return render_template("track_ticket.html", current_user=current_user, current_page='track_a_ticket',form=form)
 
 
 
@@ -461,7 +500,7 @@ def profile():
         else:
             current_user.email = account_form.email.data.lower()
             db.session.commit()
-            flash("Your Account Info has been updated successfully!", "info")
+            flash("Your Account Info has been updated successfully!", "success")
             return redirect(url_for("profile"))
     else:
         account_form.email.data = current_user.email
@@ -469,7 +508,7 @@ def profile():
         hashed_password = bcrypt.generate_password_hash(password_form.new_password.data)
         current_user.password = hashed_password
         db.session.commit()
-        flash("Your Password has been updated successfully!", "info")
+        flash("Your Password has been updated successfully!", "success")
         return redirect(url_for("profile"))
     return render_template(
         "user_profile.html", account_form=account_form, password_form=password_form, current_page='settings'
@@ -500,21 +539,22 @@ from werkzeug.exceptions import RequestEntityTooLarge
 def handle_large_file_error(e):
     flash("File is too large! Maximum allowed size is 2MB.", "error")
     return redirect(request.url)  # Redirect back to the form
-# @app.errorhandler(404)
-# def error_404(error):
-#     return render_template("404.html")
-#
-#
-# @app.errorhandler(403)
-# def error_403(error):
-#     return render_template("403.html")
-#
-#
-# @app.errorhandler(401)
-# def error_401(error):
-#     return render_template("401.html")
-#
-#
-# @app.errorhandler(500)
-# def error_500(error):
-#     return render_template("500.html")
+
+@app.errorhandler(404)
+def error_404(error):
+    return render_template("404.html")
+
+
+@app.errorhandler(403)
+def error_403(error):
+    return render_template("403.html")
+
+
+@app.errorhandler(401)
+def error_401(error):
+    return render_template("401.html")
+
+
+@app.errorhandler(500)
+def error_500(error):
+    return render_template("500.html")

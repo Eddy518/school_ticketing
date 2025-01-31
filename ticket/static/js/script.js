@@ -1,6 +1,6 @@
 const copyrightYear = document.querySelector("#copyright-year");
-const passwordField = document.getElementById("password");
-const confirmPasswordField = document.getElementById("confirm-password");
+const passwordField = document.querySelector(".password-input");
+const confirmPasswordField = document.querySelector(".confirm-password-input");
 const togglePassword = document.querySelector(".password-toggle-icon i");
 const confirmTogglePassword = document.querySelector(
   ".confirm-password-toggle-icon i",
@@ -20,6 +20,7 @@ setTimeout(() => {
 }, 5000);
 
 if (togglePassword) {
+  console.log("hey true");
   togglePassword.addEventListener("click", function () {
     if (passwordField.type === "password") {
       passwordField.type = "text";
