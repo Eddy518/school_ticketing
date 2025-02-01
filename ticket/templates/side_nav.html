@@ -1,107 +1,167 @@
-<button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button"
-        class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
-        <span class="sr-only">Open sidebar</span>
-        <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg">
-                <path clip-rule="evenodd" fill-rule="evenodd"
-                        d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z">
-                </path>
-        </svg>
+<button
+    data-drawer-target="logo-sidebar"
+    data-drawer-toggle="logo-sidebar"
+    aria-controls="logo-sidebar"
+    type="button"
+    class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+>
+    <span class="sr-only">Open sidebar</span>
+    <svg
+        class="w-6 h-6"
+        aria-hidden="true"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path
+            clip-rule="evenodd"
+            fill-rule="evenodd"
+            d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
+        ></path>
+    </svg>
 </button>
 
-<aside id="logo-sidebar"
-        class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
-        aria-label="Sidebar">
-        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-                <a href="{{ url_for('home') }}" class="flex items-center ps-2.5 mb-5">
-                        <img src="{{ url_for('static', filename='assets/logo.png') }}" class="h-6 me-3 sm:h-7"
-                                alt="Flowbite Logo" />
-                        <span
-                                class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">StuTicket</span>
+<aside
+    id="logo-sidebar"
+    class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+    aria-label="Sidebar"
+>
+    <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50">
+        <a href="{{ url_for('home') }}" class="flex items-center ps-2.5 mb-5">
+            <img
+                src="{{ url_for('static', filename='assets/logo.png') }}"
+                class="h-6 me-3 sm:h-7"
+                alt="Flowbite Logo"
+            />
+            <span class="self-center text-xl font-semibold whitespace-nowrap"
+                >StuTicket</span
+            >
+            {% if current_user.role == 'staff' %}
+            <span class="ml-1">(Staff)</span>
+            {% endif %}
+        </a>
+        <ul class="space-y-2 font-medium">
+            <li
+                class="flex items-center hover:bg-gray-50 {% if current_page == 'home' %} bg-gray-100 {% endif %}"
+            >
+                <a
+                    href="{{ url_for('home') }}"
+                    class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                >
+                    <i class="fa-solid fa-house"></i>
+                    <span class="ms-3"
+                        ><a href="{{ url_for('home') }}">Home</a></span
+                    >
                 </a>
-                <ul class="space-y-2 font-medium">
-                        <li class="flex items-center hover:bg-gray-50
-                                {% if current_page == 'home' %}
-                                bg-gray-100
-                                {% endif %}
-                                ">
-                                <a href="{{ url_for('home') }}"
-                                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                        <i class="fa-solid fa-house"></i>
-                                        <span class="ms-3"><a href="{{ url_for('home') }}">Home</a></span>
-                                </a>
-                        </li>
-                        <li class="flex items-center
-                                {% if current_page == 'create_a_ticket' %}
-                                bg-gray-100
-                                {% endif %}
-                                ">
-                                <a href="{{ url_for('available_tickets') }}"
-                                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                        <i class="fa-solid fa-pen"></i>
-                                        <span class="flex-1 ms-3 whitespace-nowrap"><a
-                                                        href="{{ url_for('available_tickets') }}">Create a
-                                                        ticket</a></span>
-                                </a>
-                        </li>
-                        <li class="flex items-center
-                                {% if current_page == 'view_all_tickets' %}
-                                bg-gray-200
-                                {% endif %}
-                                ">
-                                <a href="{{ url_for('show_user_tickets') }}"
-                                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                        <i class="fa-solid fa-list"></i>
-                                        <span class="flex-1 ms-3 whitespace-nowrap"><a
-                                                        href="{{ url_for('show_user_tickets') }}">Your
-                                                        tickets</a></span>
-                                </a>
-                        </li>
-                        <li class="flex items-center
-                                {% if current_page == 'track_a_ticket' %}
-                                bg-gray-100
-                                {% endif %}
-                                ">
-                                <a href="{{ url_for('find_ticket') }}"
-                                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                        <i class="fa-solid fa-flag"></i>
-                                        <span class="flex-1 ms-3 whitespace-nowrap"><a
-                                                        href="{{ url_for('find_ticket') }}">Track a ticket</a></span>
-                                </a>
-                        </li>
-                        <li class="flex items-center
-                                {% if current_page == 'ticket_analytics' %}
-                                bg-gray-100
-                                {% endif %}
-                                ">
-                                <a href="{{ url_for('graph_tickets') }}"
-                                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                        <i class="fa-solid fa-chart-line"></i>
-                                        <span class="flex-1 ms-3 whitespace-nowrap"><a
-                                                        href="{{ url_for('graph_tickets') }}">Ticket
-                                                        Analytics</a></span>
-                                </a>
-                        </li>
-                        <li class="flex items-center
-                                {% if current_page == 'settings' %}
-                                bg-gray-200
-                                {% endif %}
-                                ">
-                                <a href="{{ url_for('profile') }}"
-                                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                        <i class="fa-solid fa-gear"></i>
-                                        <span class="flex-1 ms-3 whitespace-nowrap"><a
-                                                        href="{{ url_for('profile') }}">Settings</a></span>
-                                </a>
-                        </li>
-                        <li class="flex items-center">
-                                <a href="{{ url_for('logout') }}"
-                                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                        <i class="fa-solid fa-right-from-bracket"></i>
-                                        <span class="flex-1 ms-3 whitespace-nowrap"><a
-                                                        href="{{ url_for('logout') }}">Log Out</a></span>
-                                </a>
-                        </li>
-                </ul>
-        </div>
+            </li>
+            {% if current_user.role == 'student' %}
+            <li
+                class="flex items-center {% if current_page == 'create_a_ticket' %} bg-gray-100 {% endif %}"
+            >
+                <a
+                    href="{{ url_for('available_tickets') }}"
+                    class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                >
+                    <i class="fa-solid fa-pen"></i>
+                    <span class="flex-1 ms-3 whitespace-nowrap"
+                        ><a href="{{ url_for('available_tickets') }}"
+                            >Create a ticket</a
+                        ></span
+                    >
+                </a>
+            </li>
+            <li
+                class="flex items-center {% if current_page == 'view_all_tickets' %} bg-gray-200 {% endif %}"
+            >
+                <a
+                    href="{{ url_for('show_user_tickets') }}"
+                    class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                >
+                    <i class="fa-solid fa-list"></i>
+                    <span class="flex-1 ms-3 whitespace-nowrap"
+                        ><a href="{{ url_for('show_user_tickets') }}"
+                            >Your tickets</a
+                        ></span
+                    >
+                </a>
+            </li>
+            {% endif %} {% if current_user.role == 'staff' %}
+            <li
+                class="flex items-center {% if current_page == 'ticket_analytics' %} bg-gray-100 {% endif %}"
+            >
+                <a
+                    href="{{ url_for('department_tickets',department=current_user.department) }}"
+                    class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                >
+                    <i class="fa-solid fa-list"></i>
+                    <span class="flex-1 ms-3 whitespace-nowrap"
+                        ><a
+                            href="{{ url_for('department_tickets',department=current_user.department) }}"
+                            ><span class="uppercase"
+                                >{{ current_user.department }}</span
+                            >
+                            Dept. Tickets</a
+                        ></span
+                    >
+                </a>
+            </li>
+            {% endif %}
+            <li
+                class="flex items-center {% if current_page == 'track_a_ticket' %} bg-gray-100 {% endif %}"
+            >
+                <a
+                    href="{{ url_for('find_ticket') }}"
+                    class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                >
+                    <i class="fa-solid fa-flag"></i>
+                    <span class="flex-1 ms-3 whitespace-nowrap"
+                        ><a href="{{ url_for('find_ticket') }}"
+                            >Track a ticket</a
+                        ></span
+                    >
+                </a>
+            </li>
+            {% if current_user.role == 'staff' %}
+            <li
+                class="flex items-center {% if current_page == 'ticket_analytics' %} bg-gray-100 {% endif %}"
+            >
+                <a
+                    href="{{ url_for('graph_tickets') }}"
+                    class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                >
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span class="flex-1 ms-3 whitespace-nowrap"
+                        ><a href="{{ url_for('graph_tickets') }}"
+                            >Ticket Analytics</a
+                        ></span
+                    >
+                </a>
+            </li>
+            {% endif %}
+            <li
+                class="flex items-center {% if current_page == 'settings' %} bg-gray-200 {% endif %}"
+            >
+                <a
+                    href="{{ url_for('profile') }}"
+                    class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                >
+                    <i class="fa-solid fa-gear"></i>
+                    <span class="flex-1 ms-3 whitespace-nowrap"
+                        ><a href="{{ url_for('profile') }}">Settings</a></span
+                    >
+                </a>
+            </li>
+            <li class="flex items-center">
+                <a
+                    href="{{ url_for('logout') }}"
+                    class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                >
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="flex-1 ms-3 whitespace-nowrap"
+                        ><a href="{{ url_for('logout') }}">Log Out</a></span
+                    >
+                </a>
+            </li>
+        </ul>
+    </div>
 </aside>

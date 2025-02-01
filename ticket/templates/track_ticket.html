@@ -1,75 +1,95 @@
-{% extends "base.html" %}
-{% block head %}
-{{ super() }}
-<meta name="csrf_token" content="{{ csrf_token() }}">
-{% endblock head %}
-{% block search %}
-{% endblock search %}
-{% block body %}
-{% include "side_nav.html" %}
+{% extends "base.html" %} {% block head %} {{ super() }}
+<meta name="csrf_token" content="{{ csrf_token() }}" />
+{% endblock head %} {% block search %} {% endblock search %} {% block body %} {%
+include "side_nav.html" %}
 <div class="p-4 sm:ml-64">
-        <div class="p-8">
-                <h1 class="text-3xl font-bold text-[#6b7280] text-center mb-8">Ticket Tracker</h1>
-                <p class="text-[#6b7280] text-center mb-8">Please input below the unique ticket id provided during
-                        generation
-                        of a ticket.</p>
-                <form method="post" class="max-w-sm mx-auto">
-                        {{ form.csrf_token }}
-                        <div class="mb-5">
-                                <label for="ticket"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ticket
-                                        ID</label>
-                                {{ form.ticket_id(id="ticket",
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500") }}
-                        </div>
-                        {{ form.submit(class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 hover:cursor-pointer") }}
-                </form>
-        </div>
-{% if ticket %}
-<div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-8">
-    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                <th scope="col" class="px-6 py-3">TicketID</th>
-                <th scope="col" class="px-6 py-3">Department</th>
-                <th scope="col" class="px-6 py-3">Service</th>
-                <th scope="col" class="px-6 py-3">Subject</th>
+    <div class="p-8">
+        <h1 class="text-3xl font-bold text-[#6b7280] text-center mb-8">
+            Ticket Tracker
+        </h1>
+        <p class="text-[#6b7280] text-center mb-8">
+            Please input below the unique ticket id provided during generation
+            of a ticket.
+        </p>
+        <form method="post" class="max-w-sm mx-auto">
+            {{ form.csrf_token }}
+            <div class="mb-5">
+                <label
+                    for="ticket"
+                    class="block mb-2 text-sm font-medium text-gray-900"
+                    >Ticket ID</label
+                >
+                {{ form.ticket_id(id="ticket", class="bg-gray-50 border
+                border-gray-300 text-gray-900 text-sm rounded-lg
+                focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5")
+                }}
+            </div>
+            {{ form.submit(class="text-white bg-blue-700 hover:bg-blue-800
+            focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium
+            rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center
+            hover:cursor-pointer") }}
+        </form>
+    </div>
+    {% if ticket %}
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-8">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3">TicketID</th>
+                    <th scope="col" class="px-6 py-3">Department</th>
+                    <th scope="col" class="px-6 py-3">Service</th>
+                    <th scope="col" class="px-6 py-3">Subject</th>
                     {% if current_user.id == ticket.user_id %}
-                <th scope="col" class="px-6 py-3">Message</th>
+                    <th scope="col" class="px-6 py-3">Message</th>
                     {% endif %}
-                <th scope="col" class="px-6 py-3">Status</th>
+                    <th scope="col" class="px-6 py-3">Status</th>
                     {% if current_user.id == ticket.user_id %}
-                <th scope="col" class="px-6 py-3">Actions</th>
+                    <th scope="col" class="px-6 py-3">Actions</th>
                     {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    {{ ticket.ticket_id }}
-                </th>
-                <td class="px-6 py-4">{{ ticket.department }}</td>
-                <td class="px-6 py-4">{{ ticket.service }}</td>
-                <td class="px-6 py-4">{{ ticket.subject }}</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-white border-b">
+                    <th
+                        scope="row"
+                        class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                    >
+                        {{ ticket.ticket_id }}
+                    </th>
+                    <td class="px-6 py-4">{{ ticket.department }}</td>
+                    <td class="px-6 py-4">{{ ticket.service }}</td>
+                    <td class="px-6 py-4">{{ ticket.subject }}</td>
                     {% if current_user.id == ticket.user_id %}
-                <td class="px-6 py-4 max-w-xs truncate">{{ ticket.message }}</td>
+                    <td class="px-6 py-4 max-w-xs truncate">
+                        {{ ticket.message }}
+                    </td>
                     {% endif %}
-                <td class="px-6 py-4 max-w-xs truncate">{{ ticket.ticket_status }}</td>
+                    <td class="px-6 py-4 max-w-xs truncate">
+                        {{ ticket.ticket_status }}
+                    </td>
                     {% if current_user.id == ticket.user_id %}
-                <td class="px-6 py-4">
-                    <a href="" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a> |
-                    <a href="{{ url_for('view_ticket', ticket_id=ticket.ticket_id) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">View More</a>
-                </td>
+                    <td class="px-6 py-4">
+                        <a
+                            href=""
+                            class="font-medium text-blue-600 hover:underline"
+                            >Edit</a
+                        >
+                        |
+                        <a
+                            href="{{ url_for('view_ticket', ticket_id=ticket.ticket_id) }}"
+                            class="font-medium text-blue-600 hover:underline"
+                            >View More</a
+                        >
+                    </td>
                     {% endif %}
-            </tr>
-        </tbody>
-    </table>
-</div>
-{% endif %}
-{% if error %}
-<div class="p-4 mt-8 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-    {{ error }}
-</div>
-{% endif %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif %} {% if error %}
+    <div class="p-4 mt-8 text-red-800 rounded-lg bg-red-50" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
 </div>
 {% endblock body %}

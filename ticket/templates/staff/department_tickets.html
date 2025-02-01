@@ -6,9 +6,7 @@ include "side_nav.html" %}
     <h1 class="text-3xl font-bold text-[#6b7280] text-center mb-8">
         All Tickets
     </h1>
-    <p class="text-[#6b7280] text-center mb-8">
-        These are the tickets that you submitted
-    </p>
+    <p class="text-[#6b7280] text-center mb-8">{{ department }} Tickets</p>
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table class="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
@@ -23,7 +21,7 @@ include "side_nav.html" %}
                 </tr>
             </thead>
             <tbody>
-                {% for user_ticket in user_tickets %}
+                {% for ticket in tickets %}
                 <tr
                     class="odd:bg-white even:bg-gray-50 border-b border-gray-200"
                 >
@@ -31,29 +29,29 @@ include "side_nav.html" %}
                         scope="row"
                         class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                     >
-                        {{ user_ticket.ticket_id }}
+                        {{ ticket.ticket_id }}
                     </th>
-                    <td class="px-6 py-4">{{ user_ticket.department }}</td>
-                    <td class="px-6 py-4">{{ user_ticket.service }}</td>
+                    <td class="px-6 py-4">{{ ticket.department }}</td>
+                    <td class="px-6 py-4">{{ ticket.service }}</td>
                     <td class="px-6 py-4 max-w-xs truncate">
-                        {{ user_ticket.subject }}
+                        {{ ticket.subject }}
                     </td>
                     <td class="px-6 py-4 max-w-xs truncate">
-                        {{ user_ticket.message }}
+                        {{ ticket.message }}
                     </td>
                     <td class="px-6 py-4 max-w-xs truncate">
-                        {{ user_ticket.ticket_status }}
+                        {{ ticket.ticket_status }}
                     </td>
                     <td class="px-6 py-4">
                         <a
-                            href="{{ url_for('edit_ticket',ticket_id=user_ticket.ticket_id) }}"
+                            href="{{ url_for('edit_ticket',ticket_id=ticket.ticket_id) }}"
                             class="font-medium text-blue-600 hover:underline"
                             >Edit</a
                         >
                         |
                         <a
                             class="font-medium text-blue-600 hover:underline"
-                            href="{{ url_for('view_ticket', ticket_id=user_ticket.ticket_id) }}"
+                            href="{{ url_for('view_ticket', ticket_id=ticket.ticket_id) }}"
                             >View More</a
                         >
                     </td>

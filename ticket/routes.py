@@ -1,14 +1,11 @@
 import os
-import random
-import secrets
-import string
 import uuid
 import pytz
 import matplotlib.pyplot as plt
 import io
-from urllib.parse import urlencode
-from datetime import datetime, timezone
 from werkzeug.utils import secure_filename
+from functools import wraps
+from datetime import datetime
 
 import requests
 from flask import (
@@ -29,17 +26,17 @@ from flask_mail import Message
 
 from ticket import app, bcrypt, db, mail, allowed_file, get_department_and_service
 from ticket.form import (
-    DeleteAccountForm,
     LoginForm,
     PasswordResetForm,
     RegisterForm,
     RequestResetForm,
+    StaffUpdateTicketForm,
     UpdateAccountForm,
     UpdatePasswordForm,
     TicketForm,
     EditTicketForm,
     TrackTicketForm,
-    SupportForm
+    StaffRegistrationForm
 )
 from ticket.models import User, Ticket
 
@@ -50,6 +47,26 @@ def home():
     tickets = Ticket.query.order_by(Ticket.created_at).all()
     return render_template("index.html", current_user=current_user, current_page='home', tickets=tickets)
 
+@app.route('/tickets/<department>/all')
+def department_tickets(department):
+    department = current_user.department
+    tickets = Ticket.query.filter_by(department=current_user.department).all()
+    return render_template("staff/department_tickets.html",current_user=current_user,department=department, tickets=tickets)
+
+# Updating a ticket
+@app.route("/staff/ticket/<int:ticket_id>/update", methods=["GET", "POST"])
+@login_required
+def update_ticket_status(ticket_id):
+    if current_user.role != 'staff':
+        abort(403)
+    ticket = Ticket.query.get_or_404(ticket_id)
+    if request.method == 'POST':
+        new_status = request.form.get('status')
+        ticket.ticket_status = new_status
+        db.session.commit()
+        flash('Ticket status updated successfully!', 'success')
+        return redirect(url_for('staff_tickets'))
+    return render_template('staff/update_ticket.html', ticket=ticket)
 
 @app.route("/tickets/all")
 def available_tickets():
@@ -185,7 +202,7 @@ def edit_ticket(ticket_id):
             ):
             flash("Nothing has changed","info")
             return redirect(url_for('edit_ticket',ticket_id=ticket.ticket_id))
-        
+
         print("I am being called")
         new_ticket_id = str(uuid.uuid4().fields[-1])[:9]
 
@@ -216,47 +233,6 @@ def edit_ticket(ticket_id):
             db.session.rollback()
             flash('An error occurred while creating the ticket. Please try again', 'error')
             print(f"Error creating ticket: {str(e)}")
-    #     else:
-    #         print("I am being called")
-    #         ticket_id = str(uuid.uuid4().fields[-1])[:9]
-    #         try:
-    #             file_path = None
-    #             if 'file_input' in request.files:
-    #                 file = request.files['file_input']
-    #                 if file and file.filename != '' and allowed_file(file.filename):
-    #                     filename = f"{ticket_id}_{secure_filename(file.filename)}"
-    #                     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    #                     file.save(file_path)
-    #                     file_path = filename
-    #             new_ticket = Ticket(
-    #             ticket_id=ticket_id,
-    #             department = ticket.department,
-    #             service = ticket.service,
-    #             full_name = form.full_name.data,
-    #             email = form.email.data,
-    #             reg_no = form.reg_no.data,
-    #             subject = form.subject.data,
-    #             message = form.message.data,
-    #             file_input=file_path,
-    #             user_id = current_user.id,
-    #             )
-    #             db.session.add(new_ticket)
-    #             db.session.commit()
-    #             flash('New Ticket has been submitted successfully! Your ticket ID is: ' + ticket_id, 'success')
-    #             redirect(url_for('view_ticket'))
-    #
-    #         except Exception as e:
-    #             db.session.rollback()
-    #             flash('An error occurred while creating the ticket. Please try again','error')
-    #             print(f"Error creating ticket: {str(e)}")
-    # else:
-    #     for field, errors in form.errors.items():
-    #         for error in errors:
-    #             print(
-    #                 f"Error in {getattr(form, field).label.text}: {error}", "error"
-    #             )
-
-
     return render_template("edit_ticket.html",form=form, ticket=ticket)
 
 @app.route("/ticket/track", methods=["GET","POST"])
@@ -273,32 +249,56 @@ def find_ticket():
     return render_template("track_ticket.html", current_user=current_user, current_page='track_a_ticket',form=form)
 
 
-
+# Present the created ticket date in local time instead of utc
 def convert_to_local(utc_dt):
     """Convert UTC time to user's local timezone"""
     user_tz = request.cookies.get('user_timezone', 'UTC')
     local_timezone = pytz.timezone(user_tz)
     return utc_dt.replace(tzinfo=pytz.utc).astimezone(local_timezone)
 
-@app.route("/ticket/<ticket_id>")
+
+@app.route("/ticket/<ticket_id>", methods=["GET", "POST"])
 @login_required
 def view_ticket(ticket_id):
     ticket = Ticket.query.filter_by(ticket_id=ticket_id).first_or_404()
     local_created_at = convert_to_local(ticket.created_at)
-    return render_template("view_ticket.html", 
-                         ticket=ticket, 
-                         current_page='track_ticket', local_created_at=local_created_at)
+
+    if current_user.role == 'staff':
+        form = StaffUpdateTicketForm()
+
+        if form.validate_on_submit():
+            # Update the ticket fields
+            ticket.ticket_status = form.ticket_status.data
+            ticket.remarks = form.remarks.data
+            ticket.last_modified_date = datetime.utcnow()  # Use function call
+
+            # Commit changes to the database
+            db.session.commit()
+
+            flash("Ticket updated successfully!", "success")
+            return redirect(url_for("view_ticket", ticket_id=ticket_id))  # Redirect to avoid form resubmission
+
+        return render_template("view_ticket.html",
+                               ticket=ticket,
+                               current_page='track_ticket',
+                               form=form,
+                               local_created_at=local_created_at)
+
+    return render_template("view_ticket.html",
+                           ticket=ticket,
+                           current_page='track_ticket',
+                           local_created_at=local_created_at)
 
 
 @app.route("/view-pdf/<ticket_id>")
 @login_required
 def view_pdf(ticket_id):
     ticket = Ticket.query.filter_by(ticket_id=ticket_id).first_or_404()
-    
+
     if not ticket.file_input or not ticket.file_input.lower().endswith('.pdf'):
         flash('No PDF file attached to this ticket', 'error')
         return redirect(url_for('view_ticket', ticket_id=ticket_id))
-    
+
     try:
         # Return the file with Content-Type as application/pdf
         return send_from_directory(
@@ -315,14 +315,14 @@ def view_pdf(ticket_id):
 @login_required
 def download_file(ticket_id):
     ticket = Ticket.query.filter_by(ticket_id=ticket_id).first_or_404()
-    
+
     if not ticket.file_input:
         flash('No file attached to this ticket', 'error')
         return redirect(url_for('view_ticket', ticket_id=ticket_id))
-    
+
     # Get the filename from the file_input field
     filename = ticket.file_input
-    
+
     try:
         # Return the file from the upload folder
         return send_from_directory(
@@ -342,35 +342,7 @@ def show_user_tickets():
     print(user_tickets)
     return render_template("user_tickets.html", current_page='view_all_tickets',user_tickets=user_tickets)
 
-# @app.route("/support", methods=["GET", "POST"])
-# def support():
-#     form = SupportForm()
-#     if request.method == "GET" and current_user.is_authenticated:
-#         print(current_user)
-#         form.username.data = current_user.username
-#         form.email.data = current_user.email
-#     if form.validate_on_submit() and current_user.is_authenticated:
-#         username = form.username.data
-#         email = form.email.data
-#         message = form.message.data
-#         support_msg = Message(f"Message from {username}", sender=email, recipients=["edmwangi2@gmail.com"])
-#         support_msg.body = message
-#         mail.send(support_msg)
-#         flash("Message Successfully sent", "success")
-#         form.message.data = ""
-#     elif not current_user.is_authenticated:
-#         email = form.email.data
-#         message = form.message.data
-#         guest_msg = Message(f"Message from {email}", sender=email, recipients=["edmwangi2@gmail.com"])
-#         guest_msg.body = message
-#         if request.method == 'POST' and email != '' and message != '' and guest_msg.body != '' and guest_msg != '':
-#             mail.send(guest_msg)
-#             flash("Message Successfully sent", "success")
-#             form.message.data = ""
-#
-#     return render_template("support.html", form=form, current_user=current_user)
-#
-#
+
 @app.route("/signin/", methods=("GET", "POST"))
 @app.route("/SIGNIN/", methods=("GET", "POST"))
 @app.route("/LOGIN/", methods=("GET", "POST"))
@@ -428,6 +400,45 @@ def register():
 
     return render_template("register_user.html", form=form)
 
+
+@app.route("/staff/register/", methods=["POST", "GET"])
+@app.route("/staff/REGISTER/", methods=["GET", "POST"])
+@app.route("/staff/SIGNUP/", methods=["GET", "POST"])
+@app.route("/staff/signup/", methods=["GET", "POST"])
+def register_staff():
+    if current_user.is_authenticated:
+        return redirect(url_for("home"))
+    form = StaffRegistrationForm()
+    if request.method == "POST":
+        if form.validate_on_submit():
+            email = form.email.data.lower()
+            department = form.department.data
+            password = form.password.data
+            role = 'staff'
+
+            hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
+            user = User(
+                email=email,
+                department=department,
+                password=hashed_password,
+                role=role
+            )
+
+            db.session.add(user)
+            db.session.commit()
+            flash(
+                f" {form.email.data} you have been successfully registered. Log in to proceed.",
+                "success",
+            )
+            return redirect(url_for("login"))
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    print(
+                        f"Error in {getattr(form, field).label.text}: {error}", "error"
+                    )
+
+    return render_template("staff/register_staff.html", form=form)
 
 def send_reset_email(user):
     token = user.get_reset_token()

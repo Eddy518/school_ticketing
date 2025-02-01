@@ -9,6 +9,7 @@ from wtforms import (
     SubmitField,
     ValidationError,
     TextAreaField,
+    SelectField
 )
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 from ticket.models import User
@@ -34,9 +35,48 @@ class LoginForm(FlaskForm):
     remember = BooleanField("Remember Me")
     submit = SubmitField("Login")
 
+
+# Admin form
+class StaffRegistrationForm(FlaskForm):
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    department = SelectField('Department',
+                           choices=[
+                               ('it', 'IT Department'),
+                               ('admissions', 'Admissions Department'),
+                               ('finance', 'Finance Department')
+                           ],
+                           validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm Password',
+                                   validators=[DataRequired(),
+                                             EqualTo('password')])
+    submit = SubmitField('Create an Account')
+
+    # def validate_email(self, email):
+    #     user = User.query.filter_by(email=email.data).first()
+    #     if user:
+    #         raise ValidationError('Email already registered.')
+
+
+class StaffUpdateTicketForm(FlaskForm):
+    ticket_status = SelectField('Ticket Status',
+                           choices=[
+                               ('pending', 'Pending'),
+                               ('under_consideration', 'Under Consideration'),
+                               ('duplicate', 'Duplicate'),
+                               ('awaiting_confirmation', 'Awaiting Confirmation'),
+                               ('in_person_needed', 'In Person Needed'),
+                               ('completed', 'Completed'),
+                               ('rejected', 'Rejected')
+                           ],
+                           validators=[DataRequired()])
+    remarks = TextAreaField('Ticket Update Remarks')
+    submit = SubmitField("Update Ticket Status")
+
 class TrackTicketForm(FlaskForm):
-    ticket_id = StringField("TicketID",validators=[DataRequired()])
+    ticket_id = StringField("TicketID", validators=[DataRequired()])
     submit = SubmitField("Find Ticket")
+
 
 class TicketForm(FlaskForm):
     full_name = StringField("Full Name", validators=[DataRequired(),
@@ -62,13 +102,6 @@ class EditTicketForm(FlaskForm):
     file_input = FileField("File Attachments if any:")
     recaptcha = RecaptchaField()
     submit = SubmitField()
-
-
-class SupportForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired()])
-    email = EmailField("Email", validators=[Email(), DataRequired()])
-    message = TextAreaField("Message", validators=[DataRequired()])
-    submit = SubmitField("Send")
 
 
 class RequestResetForm(FlaskForm):

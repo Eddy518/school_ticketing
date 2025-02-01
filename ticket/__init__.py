@@ -34,6 +34,9 @@ def allowed_file(filename):
 
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+    os.chmod(UPLOAD_FOLDER, 0o777)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
@@ -78,7 +81,7 @@ def get_department_and_service(service_key=None, department_key=None):
                     dept.replace('_', ' '),
                     services[service_key]
                 )
-    
+
     elif department_key:
         dept = department_key.lower().replace(' ', '_')
         if dept in SERVICE_DEPARTMENTS:
