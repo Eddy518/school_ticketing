@@ -621,26 +621,26 @@ def reset_token(token):
 def profile():
     account_form = UpdateAccountForm()
     password_form = UpdatePasswordForm()
+
     if request.method == "GET":
         account_form.email.data = current_user.email
-    if account_form.validate_on_submit():
-        if (
-            current_user.email == account_form.email.data
-        ):
-            redirect(url_for("profile"))
+
+    if account_form.account_submit.data and account_form.validate_on_submit():
+        if current_user.email == account_form.email.data:
+            return redirect(url_for("profile"))
         else:
             current_user.email = account_form.email.data.lower()
             db.session.commit()
             flash("Your Account Info has been updated successfully!", "success")
             return redirect(url_for("profile"))
-    else:
-        account_form.email.data = current_user.email
-    if password_form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(password_form.new_password.data)
+
+    if password_form.password_submit.data and password_form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(password_form.new_password.data).decode("utf-8")
         current_user.password = hashed_password
         db.session.commit()
         flash("Your Password has been updated successfully!", "success")
         return redirect(url_for("profile"))
+
     return render_template(
         "user_profile.html", account_form=account_form, password_form=password_form, current_page='settings'
     )

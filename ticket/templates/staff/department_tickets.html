@@ -6,54 +6,66 @@ include "side_nav.html" %}
     <h1 class="text-3xl font-bold text-[#6b7280] text-center mb-8">
         All <span class="uppercase">{{ department }}</span> Department Tickets
     </h1>
-    <p class="text-[#6b7280] text-center mb-8">{{ department }} Tickets</p>
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3">TicketID</th>
-                    <th scope="col" class="px-6 py-3">Department</th>
-                    <th scope="col" class="px-6 py-3">Service</th>
-                    <th scope="col" class="px-6 py-3">Subject</th>
-                    <th scope="col" class="px-6 py-3">Message</th>
-                    <th scope="col" class="px-6 py-3">Status</th>
-                    <th scope="col" class="px-6 py-3">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ticket in tickets %}
-                <tr
-                    class="odd:bg-white even:bg-gray-50 border-b border-gray-200"
+    <p class="text-[#6b7280] text-center mb-8">
+        These are tickets belonging to the
+        <span class="uppercase">{{ department }}</span> department. Click on
+        view more to update ticket status or to review a ticket.
+    </p>
+    <div class="relative shadow-md sm:rounded-lg">
+        <div class="overflow-x-auto">
+            <div class="max-h-[70vh] overflow-y-auto">
+                <table
+                    class="w-full text-sm text-left rtl:text-right text-gray-500"
                 >
-                    <th
-                        scope="row"
-                        class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                    <thead
+                        class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0"
                     >
-                        {{ ticket.ticket_id }}
-                    </th>
-                    <td class="px-6 py-4">{{ ticket.department }}</td>
-                    <td class="px-6 py-4">{{ ticket.service }}</td>
-                    <td class="px-6 py-4 max-w-xs truncate">
-                        {{ ticket.subject }}
-                    </td>
-                    <td class="px-6 py-4 max-w-xs truncate">
-                        {{ ticket.message }}
-                    </td>
-                    <td class="px-6 py-4 max-w-xs truncate">
-                        {{ ticket.ticket_status }}
-                    </td>
-                    <td class="px-6 py-4">
-                        <a
-                            class="font-medium text-blue-600 hover:underline"
-                            href="{{ url_for('view_ticket', ticket_id=ticket.ticket_id) }}"
+                        <tr>
+                            <th scope="col" class="px-6 py-3">TicketID</th>
+                            <th scope="col" class="px-6 py-3">Department</th>
+                            <th scope="col" class="px-6 py-3">Service</th>
+                            <th scope="col" class="px-6 py-3">Subject</th>
+                            <th scope="col" class="px-6 py-3">Message</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                            <th scope="col" class="px-6 py-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr
+                            class="odd:bg-white even:bg-gray-50 border-b border-gray-200"
                         >
-                            Review Ticket | View More</a
-                        >
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                            <th
+                                scope="row"
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                            >
+                                {{ ticket.ticket_id }}
+                            </th>
+                            <td class="px-6 py-4">{{ ticket.department }}</td>
+                            <td class="px-6 py-4">{{ ticket.service }}</td>
+                            <td class="px-6 py-4 max-w-xs truncate">
+                                {{ ticket.subject }}
+                            </td>
+                            <td class="px-6 py-4 max-w-xs truncate">
+                                {{ ticket.message }}
+                            </td>
+                            <td class="px-6 py-4 max-w-xs truncate">
+                                {{ ticket.ticket_status }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <a
+                                    class="font-medium text-blue-600 hover:underline"
+                                    href="{{ url_for('view_ticket', ticket_id=ticket.ticket_id) }}"
+                                >
+                                    Review Ticket | View More</a
+                                >
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock body %}
