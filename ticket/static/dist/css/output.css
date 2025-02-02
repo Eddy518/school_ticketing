@@ -3718,6 +3718,11 @@ input:checked + .toggle-bg {
     --tw-ring-opacity: 1;
     --tw-ring-color: rgb(127 29 29 / var(--tw-ring-opacity, 1));
   }
+
+  .dark\:focus\:ring-red-800:focus {
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(153 27 27 / var(--tw-ring-opacity, 1));
+  }
 }
 
 @media (min-width: 1024px) {

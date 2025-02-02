@@ -205,9 +205,11 @@
                     href="{{ url_for('logout') }}"
                     class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
                 >
-                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <i class="fa-solid fa-right-from-bracket text-red-600"></i>
                     <span class="flex-1 ms-3 whitespace-nowrap"
-                        ><a href="{{ url_for('logout') }}">Log Out</a></span
+                        ><a href="{{ url_for('logout') }}" class="text-red-600"
+                            >Log Out</a
+                        ></span
                     >
                 </a>
             </li>
