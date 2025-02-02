@@ -372,7 +372,7 @@ def send_update_email(user,ticket):
     msg = Message(
         "Ticket Update Notification", sender="edmwangi2@gmail.com", recipients=[user.email]
     )
-    msg.body = f"Hello {user}, your ticket entitled {ticket.subject} has been updated to {ticket.ticket_status} at {convert_to_local(ticket.last_modified_date)}. Please log in to review it."
+    msg.body = f"Hello {user.email}, your ticket entitled {ticket.subject} has been updated to {ticket.ticket_status} at {convert_to_local(ticket.last_modified_date)}. Please log in to review it."
     mail.send(msg)
 
 @app.route("/ticket/<ticket_id>", methods=["GET", "POST"])
