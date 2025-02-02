@@ -257,14 +257,22 @@ def convert_to_local(utc_dt):
     return utc_dt.replace(tzinfo=pytz.utc).astimezone(local_timezone)
 
 
+def send_update_email(user,ticket):
+    msg = Message(
+        "Ticket Update Notification", sender="edmwangi2@gmail.com", recipients=[user.email]
+    )
+    msg.body = f"Hello {user}, your ticket entitled {ticket.subject} has been updated to {ticket.ticket_status} at {convert_to_local(ticket.last_modified_date)}. Please log in to review it."
+    mail.send(msg)
+
 @app.route("/ticket/<ticket_id>", methods=["GET", "POST"])
 @login_required
 def view_ticket(ticket_id):
     ticket = Ticket.query.filter_by(ticket_id=ticket_id).first_or_404()
     local_created_at = convert_to_local(ticket.created_at)
+    user = User.query.get_or_404(ticket.user_id)
 
     if current_user.role == 'staff':
-        form = StaffUpdateTicketForm()
+        form = StaffUpdateTicketForm(obj=ticket)
 
         if form.validate_on_submit():
             # Update the ticket fields
@@ -276,6 +284,7 @@ def view_ticket(ticket_id):
             db.session.commit()
 
             flash("Ticket updated successfully!", "success")
+            send_update_email(user, ticket)
             return redirect(url_for("view_ticket", ticket_id=ticket_id))  # Redirect to avoid form resubmission
 
         return render_template("view_ticket.html",
