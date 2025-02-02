@@ -56,7 +56,7 @@ def home():
 def department_tickets(department):
     department = current_user.department
     tickets = Ticket.query.filter_by(department=current_user.department).all()
-    return render_template("staff/department_tickets.html",current_user=current_user,department=department, tickets=tickets)
+    return render_template("staff/department_tickets.html",current_user=current_user,department=department, tickets=tickets, current_page='department_tickets')
 
 # Updating a ticket
 @app.route("/staff/ticket/<int:ticket_id>/update", methods=["GET", "POST"])

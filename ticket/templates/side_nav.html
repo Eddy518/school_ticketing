@@ -1,25 +1,74 @@
-<button
-    data-drawer-target="logo-sidebar"
-    data-drawer-toggle="logo-sidebar"
-    aria-controls="logo-sidebar"
-    type="button"
-    class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
->
-    <span class="sr-only">Open sidebar</span>
-    <svg
-        class="w-6 h-6"
-        aria-hidden="true"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
+<div class="flex flex-col sm:hidden bg-gray-50">
+    <div class="flex items-center justify-between px-4 py-2">
+        <a href="{{ url_for('home') }}" class="flex items-center">
+            <img
+                src="{{ url_for('static', filename='assets/logo.png') }}"
+                class="h-6 me-3"
+                alt="Logo"
+            />
+            <span class="self-center text-xl font-semibold whitespace-nowrap">
+                StuTicket {% if current_user.role == 'staff' %}
+                <span class="ml-1">(Staff)</span>
+                {% endif %}
+            </span>
+        </a>
+        <button
+            data-drawer-target="logo-sidebar"
+            data-drawer-toggle="logo-sidebar"
+            aria-controls="logo-sidebar"
+            type="button"
+            class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+        >
+            <span class="sr-only">Open sidebar</span>
+            <svg
+                class="w-6 h-6"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    clip-rule="evenodd"
+                    fill-rule="evenodd"
+                    d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
+                ></path>
+            </svg>
+        </button>
+    </div>
+    <div
+        class="relative px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-gray-600 shadow-md"
     >
-        <path
-            clip-rule="evenodd"
-            fill-rule="evenodd"
-            d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
-        ></path>
-    </svg>
-</button>
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                {% if current_page == 'home' %}
+                <i class="fa-solid fa-house mr-2"></i>
+                {% elif current_page == 'create_a_ticket' %}
+                <i class="fa-solid fa-pen mr-2"></i>
+                {% elif current_page == 'view_all_tickets' %}
+                <i class="fa-solid fa-list mr-2"></i>
+                {% elif current_page == 'department_tickets' %}
+                <i class="fa-solid fa-building mr-2"></i>
+                {% elif current_page == 'track_a_ticket' %}
+                <i class="fa-solid fa-flag mr-2"></i>
+                {% elif current_page == 'ticket_analytics' %}
+                <i class="fa-solid fa-chart-line mr-2"></i>
+                {% elif current_page == 'settings' %}
+                <i class="fa-solid fa-gear mr-2"></i>
+                {% endif %}
+            </div>
+            <p class="font-medium">
+                {% if current_page == 'home' %} Home {% elif current_page ==
+                'create_a_ticket' %} Create Ticket {% elif current_page ==
+                'view_all_tickets' %} Your Tickets {% elif current_page ==
+                'department_tickets' %} Department Tickets {% elif current_page
+                == 'track_a_ticket' %} Track Ticket {% elif current_page ==
+                'ticket_analytics' %} Analytics {% elif current_page ==
+                'settings' %} Settings {% endif %}
+            </p>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-white/20"></div>
+    </div>
+</div>
 
 <aside
     id="logo-sidebar"
