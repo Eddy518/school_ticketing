@@ -5,7 +5,12 @@ import matplotlib.pyplot as plt
 import io
 from werkzeug.utils import secure_filename
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timedelta
+import plotly
+import plotly.express as px
+import plotly.graph_objs as go
+from collections import Counter
+import json
 
 import requests
 from flask import (
@@ -73,35 +78,141 @@ def available_tickets():
     return render_template("available_tickets.html", current_user=current_user, current_page='create_a_ticket')
 
 
-@app.route('/ticket-graph')
-def ticket_graph():
-    # Query database for ticket counts per department
-    ticket_counts = db.session.query(Ticket.department, db.func.count(Ticket.id)).group_by(Ticket.department).all()
-
-    # Extract data
-    departments = [row[0] for row in ticket_counts]
-    counts = [row[1] for row in ticket_counts]
-
-    # Create the bar chart
-    plt.figure(figsize=(8, 5))
-    plt.bar(departments, counts, color=['blue', 'green', 'red', 'orange'])
-    plt.xlabel("Departments")
-    plt.ylabel("Number of Tickets")
-    plt.title("Tickets Created Per Department")
-    plt.xticks(rotation=30)  # Rotate x-axis labels for readability
-
-    # Convert plot to an image in memory
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    plt.close()
-
-    return Response(img.getvalue(), mimetype='image/png')
-
-
-@app.route("/tickets/visualize/graph")
+@app.route('/tickets/visualize/graph')
+@login_required
 def graph_tickets():
-    return render_template("ticket_analytics.html", current_user=current_user, current_page='ticket_analytics')
+    if current_user.role != 'staff':
+        abort(403)
+
+    staff_department = current_user.department
+    department_tickets = Ticket.query.filter_by(department=staff_department).all()
+
+    if not department_tickets:
+        return render_template(
+            'ticket_analytics.html',
+            graphJSON=None,
+            total_tickets=0,
+            department=staff_department.upper(),
+            current_user=current_user,
+            current_page='ticket_analytics',
+            message="No tickets found for your department"
+        )
+
+    # Get unique services and statuses
+    services = list(set(ticket.service for ticket in department_tickets))
+    status_types = ['pending', 'completed', 'under_consideration', 'rejected',
+                   'awaiting_confirmation', 'in_person_needed']
+
+    # Colors for different statuses
+    status_colors = {
+        'pending': '#FFA500',  # Orange
+        'completed': '#32CD32',  # Green
+        'under_consideration': '#4169E1',  # Royal Blue
+        'rejected': '#DC143C',  # Crimson
+        'awaiting_confirmation': '#9370DB',  # Purple
+        'in_person_needed': '#20B2AA'  # Light Sea Green
+    }
+
+    # Create traces - one for each status
+    traces = []
+
+    for status in status_types:
+        counts = []
+        hover_texts = []
+
+        for service in services:
+            # Get tickets for this service and status
+            service_status_tickets = [
+                t for t in department_tickets
+                if t.service == service and t.ticket_status == status
+            ]
+
+            counts.append(len(service_status_tickets))
+
+            # Create hover text with ticket details
+            ticket_details = []
+            for ticket in service_status_tickets:
+                detail = (
+                    f"Subject: {ticket.subject}<br>"
+                    f"Created: {ticket.created_at.strftime('%Y-%m-%d')}<br>"
+                    f"ID: {ticket.ticket_id}"
+                )
+                ticket_details.append(detail)
+
+            hover_text = (
+                f"Service: {service.replace('_', ' ').title()}<br>"
+                f"Status: {status.replace('_', ' ').title()}<br>"
+                f"Count: {len(service_status_tickets)}"
+            )
+            if ticket_details:
+                hover_text += f"<br><br>Tickets:<br>{('<br>' + '-'*20 + '<br>').join(ticket_details)}"
+            hover_texts.append(hover_text)
+
+        # Create trace for this status
+        trace = {
+            'name': status.replace('_', ' ').title(),
+            'x': [s.replace('_', ' ').title() for s in services],  # Service names
+            'y': counts,
+            'type': 'bar',
+            'text': hover_texts,
+            'hovertemplate': "%{text}<extra></extra>",
+            'marker': {
+                'color': status_colors[status]
+            }
+        }
+        traces.append(trace)
+
+    # Create the layout
+    layout = {
+        'title': {
+            'text': f'Service Analysis for {staff_department.upper()} Department',
+            'font': {'size': 24}
+        },
+        'xaxis': {
+            'title': 'Services',
+            'tickangle': 45,
+            'tickfont': {'size': 10}
+        },
+        'yaxis': {
+            'title': 'Number of Tickets'
+        },
+        'barmode': 'group',  # Group bars for each service
+        'bargap': 0.15,      # Gap between bar groups
+        'bargroupgap': 0.1,  # Gap between bars in a group
+        'hovermode': 'closest',
+        'plot_bgcolor': 'white',
+        'paper_bgcolor': 'white',
+        'showlegend': True,
+        'legend': {
+            'title': {'text': 'Ticket Status'},
+            'bgcolor': 'rgba(255, 255, 255, 0.8)'
+        },
+        'margin': {'t': 50, 'b': 100, 'l': 50, 'r': 50}  # Adjusted margins
+    }
+
+    plot_data = {
+        'data': traces,
+        'layout': layout
+    }
+
+    # Calculate statistics
+    total_department_tickets = len(department_tickets)
+    service_counts = {
+        service: len([t for t in department_tickets if t.service == service])
+        for service in services
+    }
+    most_used_service = max(service_counts.items(), key=lambda x: x[1])
+
+    return render_template(
+        'ticket_analytics.html',
+        graphJSON=plot_data,
+        total_tickets=total_department_tickets,
+        most_used_service=most_used_service[0].replace('_', ' ').title(),
+        most_used_service_count=most_used_service[1],
+        department=staff_department.upper(),
+        current_user=current_user,
+        current_page='ticket_analytics'
+    )
 
 
 @app.route("/ticket/create", methods=["GET", "POST"])

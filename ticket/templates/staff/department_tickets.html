@@ -4,7 +4,7 @@
 include "side_nav.html" %}
 <div class="p-4 sm:ml-64">
     <h1 class="text-3xl font-bold text-[#6b7280] text-center mb-8">
-        All Tickets
+        All <span class="uppercase">{{ department }}</span> Department Tickets
     </h1>
     <p class="text-[#6b7280] text-center mb-8">{{ department }} Tickets</p>
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -44,15 +44,10 @@ include "side_nav.html" %}
                     </td>
                     <td class="px-6 py-4">
                         <a
-                            href="{{ url_for('edit_ticket',ticket_id=ticket.ticket_id) }}"
-                            class="font-medium text-blue-600 hover:underline"
-                            >Edit</a
-                        >
-                        |
-                        <a
                             class="font-medium text-blue-600 hover:underline"
                             href="{{ url_for('view_ticket', ticket_id=ticket.ticket_id) }}"
-                            >View More</a
+                        >
+                            Review Ticket | View More</a
                         >
                     </td>
                 </tr>

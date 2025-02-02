@@ -1,16 +1,89 @@
 {% extends "base.html" %} {% block head %} {{ super() }}
-<meta name="csrf_token" content="{{ csrf_token() }}" />
-{% endblock head %} {% block search %} {% endblock search %} {% block body %} {%
-include "side_nav.html" %}
-<div class="p-4 sm:ml-64 flex justify-center">
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock %} {% block body %} {% include "side_nav.html" %}
+<div class="p-4 sm:ml-64">
     <div class="p-8">
         <h1 class="text-3xl font-bold text-gray-700 text-center mb-8">
-            Ticket Graph
+            {{ department }} Department Service Analysis
         </h1>
-        <p class="text-gray-700 text-center mb-8">
-            Live graph of ticket submission trend.
-        </p>
-        <img src="{{ url_for('ticket_graph') }}" alt="Ticket Graph" />
+
+        {% if message %}
+        <div
+            class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-8"
+        >
+            <p>{{ message }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div
+                class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500"
+            >
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">
+                    Total Department Tickets
+                </h3>
+                <p class="text-3xl font-bold text-blue-600">
+                    {{ total_tickets }}
+                </p>
+            </div>
+
+            <div
+                class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500"
+            >
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">
+                    Most Used Service
+                </h3>
+                <p class="text-xl font-bold text-purple-600">
+                    {{ most_used_service }}
+                </p>
+                <p class="text-sm text-gray-500">
+                    ({{ most_used_service_count }} tickets)
+                </p>
+            </div>
+        </div>
+
+        <!-- Graph -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            {% if graphJSON %}
+            <div id="ticketGraph" class="h-[600px]"></div>
+            <div class="mt-4 text-center text-gray-600">
+                <p>Hover over bars to see ticket details</p>
+                <p class="text-sm text-gray-500 mt-2">
+                    Click status in legend to toggle visibility
+                </p>
+            </div>
+            {% else %}
+            <div class="text-center text-gray-600 py-8">
+                <p>No ticket data available for visualization</p>
+            </div>
+            {% endif %}
+        </div>
     </div>
 </div>
-{% endblock body %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if graphJSON %}
+            const graphData = {{ graphJSON | tojson | safe }};
+
+            Plotly.newPlot('ticketGraph', graphData.data, graphData.layout, {
+                responsive: true,
+                displayModeBar: true,
+                modeBarButtons: [[
+                    'zoom2d',
+                    'pan2d',
+                    'resetScale2d',
+                    'toImage'
+                ]],
+                displaylogo: false
+            });
+
+            // Make the plot responsive
+            window.addEventListener('resize', function() {
+                Plotly.Plots.resize('ticketGraph');
+            });
+        {% endif %}
+    });
+</script>
+{% endblock %}

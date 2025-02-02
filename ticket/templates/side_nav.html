@@ -87,7 +87,7 @@
             </li>
             {% endif %} {% if current_user.role == 'staff' %}
             <li
-                class="flex items-center {% if current_page == 'ticket_analytics' %} bg-gray-100 {% endif %}"
+                class="flex items-center {% if current_page == 'department_tickets' %} bg-gray-100 {% endif %}"
             >
                 <a
                     href="{{ url_for('department_tickets',department=current_user.department) }}"
