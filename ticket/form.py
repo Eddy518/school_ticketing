@@ -1,6 +1,6 @@
 from flask_login import current_user
 from flask_wtf import FlaskForm, RecaptchaField
-from flask_wtf.file import FileField, FileAllowed
+from flask_wtf.file import FileField
 from wtforms import (
     BooleanField,
     EmailField,
