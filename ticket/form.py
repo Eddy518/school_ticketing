@@ -52,10 +52,10 @@ class StaffRegistrationForm(FlaskForm):
                                              EqualTo('password')])
     submit = SubmitField('Create an Account')
 
-    # def validate_email(self, email):
-    #     user = User.query.filter_by(email=email.data).first()
-    #     if user:
-    #         raise ValidationError('Email already registered.')
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('Email already registered.')
 
 
 class StaffUpdateTicketForm(FlaskForm):

@@ -28,6 +28,12 @@
                 <div class="font-bold text-gray-700">Ticket Status:</div>
                 <div class="text-red-500">{{ ticket.ticket_status }}</div>
 
+                <!-- Show ticket remarks if any -->
+                {% if ticket.remarks %}
+                <div class="font-bold text-gray-700">Ticket Remarks:</div>
+                <div>{{ ticket.remarks }}</div>
+                {% endif %}
+
                 <div class="font-bold text-gray-700">Subject:</div>
                 <div>{{ ticket.subject }}</div>
 

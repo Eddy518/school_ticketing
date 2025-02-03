@@ -1,30 +1,17 @@
 import os
 import uuid
 import pytz
-import matplotlib.pyplot as plt
-import io
 from werkzeug.utils import secure_filename
-from functools import wraps
-from datetime import datetime, timedelta
-import plotly
-import plotly.express as px
-import plotly.graph_objs as go
-from collections import Counter
-import json
+from datetime import datetime
 
-import requests
 from flask import (
     abort,
-    current_app,
     flash,
-    jsonify,
     redirect,
     render_template,
     request,
-    session,
     url_for,
-    send_from_directory,
-    Response
+    send_from_directory
 )
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_mail import Message

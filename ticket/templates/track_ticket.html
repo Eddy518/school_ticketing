@@ -45,6 +45,9 @@ include "side_nav.html" %}
                     <th scope="col" class="px-6 py-3">Status</th>
                     {% if current_user.id == ticket.user_id %}
                     <th scope="col" class="px-6 py-3">Actions</th>
+                    {% endif %} {% if current_user.role == 'staff' and
+                    current_user.department == ticket.department %}
+                    <th scope="col" class="px-6 py-3">Actions</th>
                     {% endif %}
                 </tr>
             </thead>
@@ -68,6 +71,21 @@ include "side_nav.html" %}
                         {{ ticket.ticket_status }}
                     </td>
                     {% if current_user.id == ticket.user_id %}
+                    <td class="px-6 py-4">
+                        <a
+                            href=""
+                            class="font-medium text-blue-600 hover:underline"
+                            >Edit</a
+                        >
+                        |
+                        <a
+                            href="{{ url_for('view_ticket', ticket_id=ticket.ticket_id) }}"
+                            class="font-medium text-blue-600 hover:underline"
+                            >View More</a
+                        >
+                    </td>
+                    {% endif %} {% if current_user.role == 'staff' and
+                    current_user.department == ticket.department %}
                     <td class="px-6 py-4">
                         <a
                             href=""
