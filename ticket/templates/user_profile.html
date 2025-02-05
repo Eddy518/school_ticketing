@@ -50,15 +50,19 @@ include "side_nav.html" %}
                             class="block mb-2 text-sm font-medium text-gray-900"
                             >Password</label
                         >
-                        {{ password_form.new_password(id="name",
-                        class="bg-gray-50 border border-gray-300 text-gray-900
-                        text-sm rounded-lg focus:ring-primary-600
-                        focus:border-primary-600 block w-full p-2.5
-                        password-input", required=True) }}
-                        <span
-                            class="password-toggle-icon absolute top-[90%] right-2.5 -translate-y-1/2 cursor-pointer"
-                            ><i class="fas fa-eye"></i
-                        ></span>
+                        <div class="flex items-center relative">
+                            {{ password_form.new_password(id="name",
+                            class="bg-gray-50 border border-gray-300
+                            text-gray-900 text-sm rounded-lg
+                            focus:ring-primary-600 focus:border-primary-600
+                            block w-full p-2.5 password-input", required=True)
+                            }}
+                            <div
+                                class="password-toggle-icon absolute right-2.5 cursor-pointer"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </div>
+                        </div>
                         {% if password_form.new_password.errors %}
                         <div class="text-red-500">
                             {% for error in password_form.new_password.errors %}
@@ -75,15 +79,19 @@ include "side_nav.html" %}
                             class="block mb-2 text-sm font-medium text-gray-900"
                             >Confirm Password</label
                         >
-                        {{ password_form.confirm_new_password(id="name",
-                        class="bg-gray-50 border border-gray-300 text-gray-900
-                        text-sm rounded-lg focus:ring-primary-600
-                        focus:border-primary-600 block w-full p-2.5
-                        confirm-password-input", required=True) }}
-                        <span
-                            class="password-toggle-icon password-toggle-icon absolute top-[90%] right-2.5 -translate-y-1/2 cursor-pointer"
-                            ><i class="fas fa-eye"></i
-                        ></span>
+                        <div class="flex items-center relative">
+                            {{ password_form.confirm_new_password(id="name",
+                            class="bg-gray-50 border border-gray-300
+                            text-gray-900 text-sm rounded-lg
+                            focus:ring-primary-600 focus:border-primary-600
+                            block w-full p-2.5 confirm-password-input",
+                            required=True) }}
+                            <div
+                                class="password-toggle-icon password-toggle-icon absolute right-2.5 cursor-pointer"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </div>
+                        </div>
                         {% if password_form.confirm_new_password.errors %}
                         <div class="text-red-500">
                             {% for error in

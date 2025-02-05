@@ -1,3 +1,4 @@
+import re
 from flask_login import current_user
 from flask_wtf import FlaskForm, RecaptchaField
 from flask_wtf.file import FileField
@@ -14,10 +15,35 @@ from wtforms import (
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 from ticket.models import User
 
+def password_check(form, field):
+    """
+    Verify that the password meets the following criteria:
+    1. 8 characters or more
+    2. At least one uppercase letter
+    3. At least one lowercase letter
+    4. At least one number
+    5. At least one special character (excluding spaces)
+    """
+    password = field.data
+
+    if len(password) < 8:
+        raise ValidationError('Password must be at least 8 characters long')
+
+    if not re.search(r'[A-Z]', password):
+        raise ValidationError('Password must contain at least one uppercase letter')
+
+    if not re.search(r'[a-z]', password):
+        raise ValidationError('Password must contain at least one lowercase letter')
+
+    if not re.search(r'[0-9]', password):
+        raise ValidationError('Password must contain at least one number')
+
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        raise ValidationError('Password must contain at least one special character')
 
 class RegisterForm(FlaskForm):
     email = EmailField(validators=[Email(), DataRequired()])
-    password = PasswordField(validators=[DataRequired(), Length(min=6)])
+    password = PasswordField(validators=[DataRequired(), Length(min=6),password_check])
     confirm_password = PasswordField(
         validators=[DataRequired(), EqualTo("password"), Length(min=6)]
     )
@@ -46,7 +72,7 @@ class StaffRegistrationForm(FlaskForm):
                                ('finance', 'Finance Department')
                            ],
                            validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6),password_check])
     confirm_password = PasswordField('Confirm Password',
                                    validators=[DataRequired(),
                                              EqualTo('password')])
@@ -119,7 +145,7 @@ class RequestResetForm(FlaskForm):
 class PasswordResetForm(FlaskForm):
     password = PasswordField(validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField(
-        validators=[DataRequired(), EqualTo("password"), Length(min=6)]
+        validators=[DataRequired(), EqualTo("password"), Length(min=6),password_check]
     )
     submit = SubmitField("Reset Password")
 
@@ -136,7 +162,7 @@ class UpdateAccountForm(FlaskForm):
 
 
 class UpdatePasswordForm(FlaskForm):
-    new_password = PasswordField("New Password:", validators=[Length(min=6)])
+    new_password = PasswordField("New Password:", validators=[Length(min=6),password_check])
     confirm_new_password = PasswordField(
         "Confirm New Password:", validators=[Length(min=6), EqualTo("new_password")]
     )
