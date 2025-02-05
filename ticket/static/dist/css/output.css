@@ -1749,14 +1749,6 @@ input:checked + .toggle-bg {
   top: 90%;
 }
 
-.top-1\/2 {
-  top: 50%;
-}
-
-.top-\[calc\(50\%\)\] {
-  top: calc(50%);
-}
-
 .z-10 {
   z-index: 10;
 }

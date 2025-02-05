@@ -357,7 +357,7 @@ def convert_to_local(utc_dt):
 
 def send_update_email(user,ticket):
     msg = Message(
-        "Ticket Update Notification", sender="edmwangi2@gmail.com", recipients=[user.email]
+        "Ticket Update Notification", sender=app.config['MAIL_USERNAME'], recipients=[user.email]
     )
     msg.body = f"Hello {user.email}, your ticket entitled {ticket.subject} has been updated to {ticket.ticket_status} at {convert_to_local(ticket.last_modified_date)}. Please log in to review it."
     mail.send(msg)
@@ -550,7 +550,7 @@ def register_staff():
 def send_reset_email(user):
     token = user.get_reset_token()
     msg = Message(
-        "Password Reset Request", sender="edmwangi2@gmail.com", recipients=[user.email]
+        "Password Reset Request", sender=app.config['MAIL_USERNAME'], recipients=[user.email]
     )
     msg.body = f"""To reset your password, visit the following link:
 {url_for('reset_token', token=token, _external=True)}
