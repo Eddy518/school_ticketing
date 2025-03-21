@@ -36,7 +36,7 @@ from ticket.models import Ticket, User
 
 @app.route("/")
 def home():
-    print(current_user.is_authenticated)
+    # print(current_user.is_authenticated)
     tickets = Ticket.query.order_by(Ticket.created_at).all()
     return render_template(
         "index.html", current_user=current_user, current_page="home", tickets=tickets
@@ -225,7 +225,7 @@ def create_ticket():
     else:
         service_key = request.args.get("service")
         department_key = request.args.get("department")
-    print("Department, Service Key in routes", department_key, service_key)
+    # print("Department, Service Key in routes", department_key, service_key)
 
     department, service = get_department_and_service(
         service_key=service_key, department_key=department_key
@@ -272,7 +272,7 @@ def create_ticket():
         for field, errors in form.errors.items():
             for error in errors:
                 print(f"Error in {getattr(form, field).label.text}: {error}", "error")
-        # form.email.data = current_user.email
+        form.email.data = current_user.email
     return render_template(
         "create_ticket.html", form=form, department=department, service=service
     )
@@ -318,7 +318,7 @@ def edit_ticket(ticket_id):
             flash("Nothing has changed", "info")
             return redirect(url_for("edit_ticket", ticket_id=ticket.ticket_id))
 
-        print("I am being called")
+        # print("I am being called")
         new_ticket_id = str(uuid.uuid4().fields[-1])[:9]
 
         file_path = None
@@ -353,7 +353,7 @@ def edit_ticket(ticket_id):
             flash(
                 "An error occurred while creating the ticket. Please try again", "error"
             )
-            print(f"Error creating ticket: {str(e)}")
+            # print(f"Error creating ticket: {str(e)}")
     return render_template("edit_ticket.html", form=form, ticket=ticket)
 
 
@@ -494,7 +494,7 @@ def show_user_tickets():
         .all()
     )
     # user_tickets = Ticket.query.all()
-    print(user_tickets)
+    # print(user_tickets)
     return render_template(
         "user_tickets.html", current_page="view_all_tickets", user_tickets=user_tickets
     )
@@ -651,13 +651,13 @@ def reset_token(token, user_id):
 
         flash("Your password has been updated! You can now log in.", "success")
         return redirect(url_for("login"))
-    print(f"Received token: {token}")
-    print(f"User ID: {user_id}")
+    # print(f"Received token: {token}")
+    # print(f"User ID: {user_id}")
     user = User.verify_reset_token(token, user_id)
-    if user is None:
-        print("Token verification failed")
-    else:
-        print(f"Token verified for user: {user.email}")
+    # if user is None:
+    #     print("Token verification failed")
+    # else:
+    #     print(f"Token verified for user: {user.email}")
 
     return render_template("reset_token.html", form=form)
 
